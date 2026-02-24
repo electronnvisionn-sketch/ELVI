@@ -1,0 +1,21 @@
+fetch("http://localhost:3000/admin-login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  credentials: "include",
+  body: JSON.stringify({
+    username: "ELVI.ADMIN.SYSTEM",
+    password: "ELECTRON.VISION.2025.2012.2011" //
+  })
+})
+.then(res => res.json())
+.then(data => {
+  console.log(data);
+  if (data.ok === true) {
+    window.location.href = "/_sys/4f9c2a7d8e1b6f3a92d";
+  } else {
+    console.error("❌ فشل تسجيل دخول الأدمن");
+  }
+})
+.catch(err => console.error(err));
