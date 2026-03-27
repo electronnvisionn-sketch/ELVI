@@ -271,10 +271,11 @@ tbody tr:hover {
 
 <!-- القائمة الجانبية -->
 <aside id="sidebar">
-    <h2>ELVI Admin</h2>
+    <h2>لوحة تحكم الأدمن</h2>
     <button data-section="support" onclick="showSection('support')">📩 دعم سريع</button>
 <button data-section="contact" onclick="showSection('contact')">💬 تواصل</button>
 <button data-section="products" onclick="showSection('products')">📦 منتجات</button>
+    <button data-section="users" onclick="showSection('users')">👥 المستخدمين</button>
 
     <button id="toggleRefreshBtn" onclick="toggleAutoRefresh()" style="background:#f5d37a; color:#000;"> التحديث التلقائي</button>
     <button onclick="logout()">🚪 تسجيل خروج</button>
@@ -355,12 +356,45 @@ tbody tr:hover {
         </div>
     </div>
 
+    <!-- المستخدمين -->
+    <div id="users" class="section">
+      <h2>👥 إدارة المستخدمين</h2>
+      <div class="card">
+        <label>بحث بالإيميل:</label>
+        <input id="userSearch" placeholder="أدخل الإيميل للبحث">
+        <button class="action" onclick="searchUsers()">بحث</button>
+      </div>
+
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th>الإيميل</th>
+            <th>الاسم</th>
+            <th>الهاتف</th>
+            <th>تفاصيل</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
 
 <script>
 let editMode=false;
 let currentSection=null;
 let lastSupportData = null;
 let lastContactData = null;
+
+// دالة هروب للنصوص لمنع XSS في العرض
+function escapeHtml(str){
+  if(!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
 
 
 function showSection(id){
@@ -375,10 +409,12 @@ function showSection(id){
     const btn = document.querySelector(`[data-section="${id}"]`);
     if (btn) btn.classList.remove("has-new");
 
-    if(id==='support'||id==='contact') fetchMessages();
+    if(id==='support') fetchSupport(true);
+    if(id==='contact') fetchContact(true);
     if(id==='products') loadProducts();
     if(id==='theme') loadTheme();
     if(id==='pages') loadPagesList();
+    if(id==='users') loadUsers();
 }
 
 
@@ -430,66 +466,70 @@ function showAdminNotification(text) {
 
 async function logout(){ await fetch("/admin-logout",{method:"POST",credentials:"include"}); location.reload(); }
 
-// عرض الرسائل في الجداول
-async function fetchMessages(){
+// جلب بيانات الدعم فقط عند الحاجة
+async function fetchSupport(force = false){
     try {
-        // جلب بيانات الدعم
-        if(currentSection === 'support' || currentSection === null) {
-const resSupport = await fetch('/api/support', { credentials:'include' });
-            const supportData = await resSupport.json();
-
-            // التحقق من التغيير
-            if(JSON.stringify(supportData) !== JSON.stringify(lastSupportData)) {
-                lastSupportData = supportData;
-                const supportTbody = document.querySelector('#supportTable tbody');
-               supportTbody.innerHTML = supportData.map(m=>`
+        const res = await fetch('/api/support', { credentials:'include' });
+        const supportData = await res.json();
+        if (force || JSON.stringify(supportData) !== JSON.stringify(lastSupportData)) {
+            lastSupportData = supportData;
+            const supportTbody = document.querySelector('#supportTable tbody');
+            supportTbody.innerHTML = supportData.map(m=>`
 <tr>
-  <td>${m.user}</td>
-  <td>${m.issue}</td>
-  <td>${m.details}</td>
+  <td>${escapeHtml(m.user)}</td>
+  <td>${escapeHtml(m.issue)}</td>
+  <td>${escapeHtml(m.details)}</td>
   <td><button class="delete" onclick="deleteSupport('${m.id}')">حذف</button></td>
 </tr>
 `).join('');
-
-
-            }
-        }
-
-        // جلب بيانات التواصل
-        if(currentSection === 'contact' || currentSection === null) {
-            const resContact = await fetch('/api/contact', { credentials:'include' });
-            const contactData = await resContact.json();
-
-            // التحقق من التغيير
-            if(JSON.stringify(contactData) !== JSON.stringify(lastContactData)) {
-                lastContactData = contactData;
-                const contactTbody = document.querySelector('#contactTable tbody');
-                contactTbody.innerHTML = contactData.map(m=>`
-                    <tr>
-                        <td>${m.name}</td>
-                        <td>${m.email}</td>
-                        <td>${m.phone}</td>
-                        <td>${m.message}</td>
-                        <td><button class="delete" onclick="deleteContact('${m.id}')">حذف</button></td>
-                    </tr>
-                `).join('');
-            }
         }
     } catch(error) {
-        console.error('خطأ في جلب الرسائل:', error);
+        console.error('خطأ في جلب رسائل الدعم:', error);
     }
+}
+
+// جلب بيانات التواصل فقط عند الحاجة
+async function fetchContact(force = false){
+    try {
+        const res = await fetch('/api/contact', { credentials:'include' });
+        const contactData = await res.json();
+        if (force || JSON.stringify(contactData) !== JSON.stringify(lastContactData)) {
+            lastContactData = contactData;
+            const contactTbody = document.querySelector('#contactTable tbody');
+            contactTbody.innerHTML = contactData.map(m=>`
+                <tr>
+                    <td>${escapeHtml(m.name)}</td>
+                    <td>${escapeHtml(m.email)}</td>
+                    <td>${escapeHtml(m.phone)}</td>
+                    <td>${escapeHtml(m.message)}</td>
+                    <td><button class="delete" onclick="deleteContact('${m.id}')">حذف</button></td>
+                </tr>
+            `).join('');
+        }
+    } catch(error) {
+        console.error('خطأ في جلب رسائل التواصل:', error);
+    }
+}
+
+// واجهة بسيطة تندمج مع الأقسام الحالية
+function fetchMessages(){
+    if(currentSection === 'support') return fetchSupport();
+    if(currentSection === 'contact') return fetchContact();
+    // افتراضي: جلب كلاهما
+    fetchSupport();
+    fetchContact();
 }
 
 // حذف الرسائل
 async function deleteSupport(id){
     if(!confirm('هل تريد حذف هذه الرسالة؟')) return;
     await fetch(`/api/support/${id}`,{ method:'DELETE', credentials:'include' });
-    fetchMessages();
+    fetchSupport(true);
 }
 async function deleteContact(id){
     if(!confirm('هل تريد حذف هذه الرسالة؟')) return;
     await fetch(`/api/contact/${id}`,{ method:'DELETE', credentials:'include' });
-    fetchMessages();
+    fetchContact(true);
 }
 
 // باقي الوظائف بدون تعديل
@@ -515,38 +555,50 @@ function unlockAudio() {
 }
 
 
+let reconnectDelay = 1000;
+const MAX_RECONNECT = 30000;
 function startAdminEvents() {
     if (eventSource) return;
 
     eventSource = new EventSource("/api/admin/events");
 
     eventSource.onmessage = (event) => {
-    const { type } = JSON.parse(event.data);
-    const indicator = document.getElementById("refreshIndicator");
-indicator.classList.add("active");
-setTimeout(()=>indicator.classList.remove("active"), 600);
+    try {
+        const { type } = JSON.parse(event.data || '{}');
+        const indicator = document.getElementById("refreshIndicator");
+        indicator.classList.add("active");
+        setTimeout(()=>indicator.classList.remove("active"), 600);
 
+        showAdminNotification("رسالة جديدة في قسم " + type);
 
-    showAdminNotification("رسالة جديدة في قسم " + type);
+        if (type === "support") {
+            markSectionAsNew("support");
+            if (currentSection === "support") fetchSupport(true);
+        }
 
-    if (type === "support") {
-        markSectionAsNew("support");
-        if (currentSection === "support") fetchMessages();
-    }
+        if (type === "contact") {
+            markSectionAsNew("contact");
+            if (currentSection === "contact") fetchContact(true);
+        }
 
-    if (type === "contact") {
-        markSectionAsNew("contact");
-        if (currentSection === "contact") fetchMessages();
+        // reset backoff on successful event
+        reconnectDelay = 1000;
+    } catch (e) {
+        console.error('SSE message parse error', e);
     }
 };
     eventSource.onopen = () => {
+        reconnectDelay = 1000;
         console.log("اتصال الأدمن مفتوح");
     };
 
     eventSource.onerror = () => {
-        eventSource.close();
+        try { eventSource.close(); } catch (e) {}
         eventSource = null;
-        setTimeout(startAdminEvents, 5000);
+        const jitter = Math.floor(Math.random() * 1000);
+        const delay = Math.min(MAX_RECONNECT, reconnectDelay + jitter);
+        setTimeout(startAdminEvents, delay);
+        reconnectDelay = Math.min(MAX_RECONNECT, reconnectDelay * 2);
     };
   
 }
@@ -602,6 +654,53 @@ async function loadProducts() {
     container.innerHTML = "<p>فشل تحميل المنتجات</p>";
   }
 }
+
+  // ------------- إدارة المستخدمين -------------
+  async function loadUsers(filter) {
+    const tbody = document.querySelector('#usersTable tbody');
+    try {
+      const q = filter || document.getElementById('userSearch').value.trim();
+      const url = q ? `/api/users?email=${encodeURIComponent(q)}` : '/api/users';
+      const res = await fetch(url, { credentials: 'include' });
+      if (!res.ok) throw new Error('Network');
+      const users = await res.json();
+      if (!Array.isArray(users) || !users.length) {
+        tbody.innerHTML = '<tr><td colspan="4">لا يوجد مستخدمون</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => {
+        const name = (u.profile && u.profile.name) ? escapeHtml(u.profile.name) : '-';
+        const phone = (u.profile && u.profile.phone) ? escapeHtml(u.profile.phone) : '-';
+        return `
+          <tr>
+            <td>${escapeHtml(u.email)}</td>
+            <td>${name}</td>
+            <td>${phone}</td>
+            <td><button class="action" onclick='showUserDetails(${JSON.stringify(JSON.stringify(u))})'>عرض</button></td>
+          </tr>
+        `;
+      }).join('');
+    } catch (err) {
+      console.error('خطأ في جلب المستخدمين:', err);
+      tbody.innerHTML = '<tr><td colspan="4">فشل جلب المستخدمين</td></tr>';
+    }
+  }
+
+  function searchUsers() {
+    loadUsers();
+  }
+
+  function showUserDetails(jsonStr) {
+    try {
+      const u = JSON.parse(jsonStr);
+      const profile = u.profile || {};
+      const html = `البريد الإلكتروني: ${u.email}\nالاسم: ${profile.name || '-'}\nالهاتف: ${profile.phone || '-'}\nالنص التعريفي: ${profile.bio || '-'} `;
+      alert(html);
+    } catch (e) {
+      alert('تعذر عرض التفاصيل');
+    }
+  }
 
 
 </script>

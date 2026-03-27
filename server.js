@@ -19,7 +19,9 @@ const app = express();
 // إعدادات التخزين المؤقت للملفات الثابتة   
 app.use(express.static(path.join(__dirname, "public"), {
   maxAge: "30d",
-  immutable: true
+  immutable: true,
+  dotfiles: 'ignore',
+  index: false
 }));
 
 // أمان إضافي للرؤوس
@@ -90,7 +92,7 @@ if (fs.existsSync(DATA_FILE)) {
         const encryptedData = fs.readFileSync(DATA_FILE, 'utf8');
         db = JSON.parse(decrypt(encryptedData));
     } catch (err) {
-        console.error('Error decrypting data.json, using default db');
+      console.error('خطأ في فك تشفير data.json، سيتم استخدام قاعدة بيانات افتراضية');
     }
 } else {
     fs.writeFileSync(DATA_FILE, encrypt(JSON.stringify(db, null, 2)));
@@ -128,33 +130,51 @@ const saveDB = () => {
     try {
         fs.writeFileSync(DATA_FILE, encrypt(JSON.stringify(db, null, 2)));
     } catch (err) {
-        console.error('Error encrypting and saving data.json');
+      console.error('خطأ في تشفير وحفظ data.json');
     }
 };
 
 // ------------------ INIT ------------------
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  // skip SSE connections (EventSource) to avoid counting long-lived connections
+  skip: (req, res) => {
+    const accept = (req.headers.accept || '').toLowerCase();
+    if (accept.includes('text/event-stream')) return true;
+    // also skip the admin events path explicitly
+    if (req.path === '/api/admin/events') return true;
+    return false;
+  }
 });
 
 // Middleware
+// CORS: allow only configured origins (comma-separated list in ALLOWED_ORIGINS).
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "").split(',').map(s=>s.trim()).filter(Boolean);
 app.use(cors({
-    origin: true,
-    credentials: true
+    origin: function(origin, cb) {
+        // Allow non-browser tools (no origin) and allow when no whitelist provided
+        if (!origin) return cb(null, true);
+        if (ALLOWED_ORIGINS.length === 0) return cb(null, true);
+        return ALLOWED_ORIGINS.includes(origin) ? cb(null, true) : cb(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS']
 }));
+
+// Session: more strict cookie settings in production
 app.use(session({
-  name: "ev_session", // ← ثبّت الاسم
+  name: "ev_session",
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   rolling: true,
   cookie: {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
     maxAge: 1000 * 60 * 60 * 24
   }
 }));
@@ -186,11 +206,33 @@ app.use((req, res, next) => {
 
 app.use(limiter);   
 
+// إضافي: رؤوس أمان صارمة تكميلية (تكميلي لـ helmet — لا أغير إعدادات helmet نفسها)
+app.use((req, res, next) => {
+  try {
+    res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+    res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade');
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=()');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+  } catch (e) {}
+  next();
+});
+
+// Health endpoint for liveness/readiness probes
+app.get('/health', (req, res) => res.json({ ok: true, uptime: process.uptime() }));
 
 const ADMIN_ROUTE = process.env.ADMIN_ROUTE;
+
+// limiter for the admin page itself – only applies before authentication
+// once the session becomes admin=true we skip the limiter so reloading
+// the dashboard doesn't trigger 429.
 const adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5
+  max: 10,
+  skip: (req, res) => {
+    if (req.session && req.session.admin === true) return true; // don't rate limit logged-in admins
+    return false;
+  }
 });
 
 
@@ -199,8 +241,9 @@ const adminLimiter = rateLimit({
 
 
 
-app.disable("x-powered-by");if (!ADMIN_ROUTE) {
-  throw new Error("ADMIN_ROUTE is not defined");
+app.disable("x-powered-by");
+if (!ADMIN_ROUTE) {
+  throw new Error("متغير ADMIN_ROUTE غير معرف");
 }
 
 app.get(ADMIN_ROUTE, adminLimiter, (req, res) => {
@@ -228,8 +271,28 @@ app.get('/index.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));    
+// Body parsers with limits to mitigate large payload attacks
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Basic input sanitization for request data
+app.use((req, res, next) => {
+  const sanitize = (obj) => {
+    if (!obj || typeof obj !== 'object') return;
+    Object.keys(obj).forEach(k => {
+      const v = obj[k];
+      if (typeof v === 'string') {
+        obj[k] = escapeHtml(v);
+      } else if (typeof v === 'object') {
+        sanitize(v);
+      }
+    });
+  };
+  sanitize(req.body);
+  sanitize(req.query);
+  sanitize(req.params);
+  next();
+});
 
 
 // Security middleware
@@ -391,20 +454,40 @@ let adminClients = [];
 
 app.get("/api/admin/events", isAdmin, (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
     res.setHeader("Connection", "keep-alive");
     res.flushHeaders();
 
-    adminClients.push(res);
+    const sessionID = req.sessionID || 'unknown';
+    const ip = req.ip || req.connection.remoteAddress || '';
+
+    // Ensure max 1 connection per admin session to avoid reconnect storms
+    adminClients = adminClients.filter(c => c.sessionID !== sessionID);
+
+    const client = {
+        sessionID,
+        ip,
+        res,
+        keepAlive: setInterval(() => {
+            try { res.write(': keepalive\n\n'); } catch (e) {}
+        }, 20000)
+    };
+
+    adminClients.push(client);
 
     req.on("close", () => {
-        adminClients = adminClients.filter(c => c !== res);
+        clearInterval(client.keepAlive);
+        adminClients = adminClients.filter(c => c !== client);
     });
 });
 
 function notifyAdmins(type) {
-    adminClients.forEach(res => {
-        res.write(`data: ${JSON.stringify({ type })}\n\n`);
+    adminClients.forEach(client => {
+        try {
+            client.res.write(`data: ${JSON.stringify({ type })}\n\n`);
+        } catch (e) {
+            // ignore broken pipe; cleanup will happen on close
+        }
     });
 }
 
@@ -425,6 +508,28 @@ app.post("/api/products", isAdmin, generalLimiter, upload.single("file"), (req,r
     saveDB();
     res.json({ ok:true });
 });
+
+    // ------------------ ADMIN: users listing ------------------
+    app.get('/api/users', isAdmin, (req, res) => {
+      try {
+        const q = (req.query.email || '').toLowerCase();
+        const users = Object.keys(db.users || {}).map(email => {
+          const u = db.users[email] || {};
+          return {
+            email,
+            profile: u.profile || {}
+          };
+        }).filter(u => {
+          if (!q) return true;
+          return u.email.toLowerCase().includes(q);
+        });
+
+        res.json(users);
+      } catch (err) {
+        console.error('Error fetching users:', err);
+        res.status(500).json({ ok:false, error: 'خطأ في جلب المستخدمين' });
+      }
+    });
 app.delete("/api/products/:id", isAdmin,(req,res)=>{
     db.products=db.products.filter(p=>p.id!=req.params.id);
     saveDB();
@@ -898,15 +1003,19 @@ app.use(compression());
 // ------------------ 404 HANDLER ------------------
 app.use((req, res) => {
   if (req.path.startsWith("/api")) {
-    return res.status(404).json({ error: "API route not found" });
+    return res.status(404).json({ error: "المسار غير موجود" });
   }
   res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
 });
 
 // ------------------ START SERVER ------------------
 app.use((err, req, res, next) => {
-  console.error(err.message);
-  res.status(500).json({ error: "Server error" });
+  console.error(err && err.stack ? err.stack : err);
+  if (req.path.startsWith('/api') || req.headers.accept?.includes('application/json')) {
+    return res.status(500).json({ ok: false, error: 'حدث خطأ في الخادم' });
+  }
+  // For browser requests, show a generic message
+  res.status(500).send('<h1>خطأ في الخادم</h1><p>حدث خطأ غير متوقع. يرجى المحاولة لاحقاً.</p>');
 });
 
 app.listen(PORT,()=>console.log(`🚀 Server running at http://localhost:${PORT}`));
