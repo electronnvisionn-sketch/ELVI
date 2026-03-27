@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - ELECTRON VISION</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/light-theme.css">
+  <style>
+    :root {
+      --color-primary: #6366f1;
+      --color-primary-hover: #4f46e5;
+      --color-secondary: #10b981;
+      --color-bg-primary: #0f0f23;
+      --color-bg-secondary: #1a1a2e;
+      --color-bg-tertiary: #16213e;
+      --color-text-primary: #f8fafc;
+      --color-text-secondary: #94a3b8;
+      --color-text-muted: #64748b;
+      --color-border: rgba(255, 255, 255, 0.1);
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-error: #ef4444;
+      --font-family: 'Cairo', sans-serif;
+      --font-size-sm: 0.875rem;
+      --font-size-base: 1rem;
+      --font-size-lg: 1.125rem;
+      --font-size-xl: 1.25rem;
+      --font-size-2xl: 1.5rem;
+      --font-size-3xl: 1.875rem;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      --spacing-2: 0.5rem;
+      --spacing-3: 0.75rem;
+      --spacing-4: 1rem;
+      --spacing-6: 1.5rem;
+      --spacing-8: 2rem;
+      --spacing-12: 3rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      --z-fixed: 1030;
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-blur: blur(20px);
+    }
+    [data-theme="light"] {
+      --color-bg-primary: #f0f4f8;
+      --color-bg-secondary: #ffffff;
+      --color-bg-tertiary: #e2e8f0;
+      --color-text-primary: #1e293b;
+      --color-text-secondary: #475569;
+      --color-text-muted: #64748b;
+      --color-border: rgba(0, 0, 0, 0.1);
+      --glass-bg: rgba(255, 255, 255, 0.8);
+      --glass-border: rgba(99, 102, 241, 0.15);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background: var(--color-bg-primary); color: var(--color-text-primary); min-height: 100vh; }
+    .navbar { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: rgba(15, 15, 35, 0.95); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--color-border); z-index: var(--z-fixed); }
+    .navbar-container { display: flex; align-items: center; justify-content: space-between; height: 100%; padding: 0 2rem; }
+    .navbar-brand img { height: 45px; }
+    @media (min-width: 993px) {
+      .navbar-nav { display: flex; align-items: center; gap: var(--spacing-2); list-style: none; }
+      .navbar-nav a { padding: var(--spacing-2) var(--spacing-4); color: var(--color-text-secondary); font-weight: var(--font-weight-medium); border-radius: var(--radius-lg); }
+      .navbar-nav a:hover, .navbar-nav a.active { color: var(--color-primary); background: rgba(99, 102, 241, 0.1); }
+      .navbar-actions { display: flex; align-items: center; gap: var(--spacing-3); }
+    }
+    .btn { display: inline-flex; align-items: center; gap: var(--spacing-2); padding: var(--spacing-3) var(--spacing-6); font-family: var(--font-family); font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); border: 2px solid transparent; border-radius: var(--radius-lg); cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-primary { background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)); color: white; border-color: var(--color-primary); }
+    .btn-primary:hover { transform: translateY(-2px); }
+    .btn-secondary { background: var(--glass-bg); color: var(--color-text-primary); border-color: var(--color-border); }
+    .btn-secondary:hover { background: var(--glass-border); border-color: var(--color-primary); }
+    .btn-sm { padding: var(--spacing-2) var(--spacing-4); font-size: var(--font-size-sm); }
+    .dashboard { padding: calc(70px + var(--spacing-8)) var(--spacing-4) var(--spacing-8); }
+    .container { max-width: 1280px; margin: 0 auto; }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-8); flex-wrap: wrap; gap: var(--spacing-4); }
+    .dashboard-welcome { display: flex; align-items: center; gap: var(--spacing-4); }
+    .dashboard-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+    .dashboard-welcome h2 { font-size: var(--font-size-2xl); margin-bottom: var(--spacing-1); }
+    .text-muted { color: var(--color-text-muted); }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-4); margin-bottom: var(--spacing-8); }
+    .glass-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--radius-xl); padding: var(--spacing-6); margin-bottom: var(--spacing-8); }
+    .dashboard-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--radius-xl); padding: var(--spacing-6); text-align: center; transition: all 0.3s ease; }
+    .dashboard-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .dashboard-card-icon { font-size: 2rem; margin-bottom: var(--spacing-2); }
+    .dashboard-card-value { font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-primary); }
+    .dashboard-card-label { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-top: var(--spacing-2); }
+    .glass-card h3 { font-size: var(--font-size-xl); margin-bottom: var(--spacing-4); }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--spacing-4); }
+    .product-card { background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.3s ease; }
+    .product-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .product-image { height: 150px; background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary)); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+    .product-content { padding: var(--spacing-4); }
+    .product-badge { display: inline-block; padding: var(--spacing-1) var(--spacing-3); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); border-radius: var(--radius-lg); margin-bottom: var(--spacing-2); }
+    .product-badge.free { background: rgba(16, 185, 129, 0.15); color: var(--color-success); }
+    .product-badge.paid { background: var(--color-warning); color: white; }
+    .product-content h3 { font-size: var(--font-size-lg); margin-bottom: var(--spacing-2); }
+    .product-content p { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: var(--spacing-2); }
+    .product-price { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-secondary); margin-bottom: var(--spacing-3); }
+    .ticket-card { background: var(--color-bg-tertiary); border-radius: var(--radius-lg); padding: var(--spacing-4); margin-bottom: var(--spacing-3); }
+    .ticket-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--spacing-3); }
+    .ticket-title { font-weight: var(--font-weight-semibold); margin-bottom: var(--spacing-1); }
+    .ticket-meta { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+    .ticket-priority, .ticket-status { display: inline-block; padding: var(--spacing-1) var(--spacing-2); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); border-radius: var(--radius-md); }
+    .ticket-priority.low { background: rgba(16, 185, 129, 0.15); color: var(--color-success); }
+    .ticket-priority.medium { background: rgba(245, 158, 11, 0.15); color: var(--color-warning); }
+    .ticket-priority.high { background: var(--color-warning); color: white; }
+    .ticket-priority.critical { background: rgba(239, 68, 68, 0.15); color: var(--color-error); }
+    .ticket-status.open { background: rgba(99, 102, 241, 0.15); color: var(--color-primary); }
+    .ticket-status.closed { background: rgba(16, 185, 129, 0.15); color: var(--color-success); }
+    .d-flex { display: flex; }
+    .gap-1 { gap: var(--spacing-2); }
+    .footer { background: var(--color-bg-secondary); border-top: 1px solid var(--color-border); padding: var(--spacing-6) 0; text-align: center; }
+    .footer p { font-size: var(--font-size-sm); color: var(--color-text-muted); margin: 0; }
+    .alert { position: fixed; top: var(--spacing-6); right: var(--spacing-6); padding: var(--spacing-4) var(--spacing-6); border-radius: var(--radius-lg); z-index: 1000; animation: slideIn 0.3s ease; }
+    .alert-success { background: rgba(16, 185, 129, 0.15); color: var(--color-success); border: 1px solid var(--color-success); }
+    .alert-error { background: rgba(239, 68, 68, 0.15); color: var(--color-error); border: 1px solid var(--color-error); }
+    .alert-info { background: rgba(99, 102, 241, 0.15); color: var(--color-primary); border: 1px solid var(--color-primary); }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    .theme-toggle, .lang-switch { padding: var(--spacing-2) var(--spacing-3); border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--glass-bg); color: var(--color-text-primary); font-family: var(--font-family); cursor: pointer; }
+    @media (max-width: 768px) { 
+      .dashboard-header { flex-direction: column; align-items: flex-start; } 
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-container">
+        <a href="/" class="navbar-brand">
+          <img src="/logo.png" alt="ELECTRON VISION" class="navbar-logo">
+          <span class="navbar-brand-text">ELECTRON VISION</span>
+        </a>
+
+        <button class="hamburger" id="hamburger" aria-label="القائمة" aria-expanded="false" aria-controls="navbarNav navbarActions">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <ul class="navbar-nav" id="navbarNav">
+          <li><a href="/" class="nav-link" data-page="home"><span class="nav-icon">🏠</span> الرئيسية</a></li>
+          <li><a href="/products" class="nav-link" data-page="products"><span class="nav-icon">📦</span> المنتجات</a></li>
+          <li><a href="/sessions" class="nav-link" data-page="booking"><span class="nav-icon">📅</span> حجوزاتي</a></li>
+          <li><a href="/support" class="nav-link" data-page="support"><span class="nav-icon">🎫</span> الدعم الفني</a></li>
+        </ul>
+
+        <div class="navbar-actions" id="navbarActions">
+          <button class="theme-toggle" onclick="toggleTheme()" title="تبديل السمة"><span>🌙</span></button>
+          <a href="/dashboard" class="btn btn-primary dashboard-btn" id="dashboardBtn">
+            <i class="fas fa-home"></i> لوحة التحكم
+          </a>
+          <button class="btn btn-danger logout-btn" id="logoutBtn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> خروج
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Notification Banner -->
+  <div class="notification-banner" id="mainNotification" style="max-width: 1280px; margin: 90px auto 0;">
+    <span>👋 مرحباً بك في لوحة التحكم! استكشف منتجاتنا الجديدة .</span>
+    <button class="close-btn" onclick="closeNotification()">✕</button>
+  </div>
+
+  <section class="dashboard">
+    <div class="container">
+      <div class="dashboard-header">
+        <div class="dashboard-welcome">
+          <div class="dashboard-avatar" id="user-avatar"></div>
+          <div>
+            <h2 id="welcome-message">مرحباً</h2>
+            <p class="text-muted" id="user-email"></p>
+          </div>
+        </div>
+        <a href="/support" class="btn btn-primary">إنشاء تذكرة دعم</a>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-card"><div class="dashboard-card-icon">📦</div><div class="dashboard-card-value" id="free-products-count">0</div><div class="dashboard-card-label">منتجات مجانية</div></div>
+        <div class="dashboard-card"><div class="dashboard-card-icon">💰</div><div class="dashboard-card-value" id="paid-products-count">0</div><div class="dashboard-card-label">منتجات مدفوعة</div></div>
+        <div class="dashboard-card"><div class="dashboard-card-icon">🎫</div><div class="dashboard-card-value" id="tickets-count">0</div><div class="dashboard-card-label">تذاكري</div></div>
+        <div class="dashboard-card"><div class="dashboard-card-icon">✅</div><div class="dashboard-card-value" id="open-tickets">0</div><div class="dashboard-card-label">تذاكر مفتوحة</div></div>
+      </div>
+
+      <div class="glass-card"><h3>تذاكر الدعم الأخيرة</h3><div id="recent-tickets"></div></div>
+      <div class="glass-card"><h3>حجوزاتي</h3><div id="recent-bookings"></div><a href="/sessions" class="btn btn-primary" style="margin-top: 1rem;">حجز جديد</a></div>
+      <div class="glass-card"><h3>المنتجات المتاحة</h3><div class="products-grid" id="products-grid"></div></div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><p>جميع الحقوق محفوظة © 2026 ELECTRON VISION</p></div></footer>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/socket-client.js"></script>
+  <script>
+    async function checkAuth() {
+      // Show loading indicator
+      document.body.classList.add('loading');
+      
+      // Debug: Log cookie info
+      console.log('[Dashboard] Cookies:', document.cookie);
+      console.log('[Dashboard] Has token:', document.cookie.includes('client_token='));
+      
+      try {
+        if (window.ElectronAuth) {
+          window.ElectronAuth.requireAuth(() => {
+            loadDashboard();
+          });
+        } else {
+          // Debug: Try direct auth/me call
+          const testResponse = await fetch('/api/auth/me', {
+            method: 'GET',
+            credentials: 'include'
+          });
+          console.log('[Dashboard] /auth/me status:', testResponse.status);
+          
+          const user = await getCurrentUser();
+          console.log('[Dashboard] getCurrentUser result:', user);
+          
+          if (!user) {
+            window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+            return;
+          }
+          const validation = validateUserStatus(user);
+          if (!validation.valid) {
+            alert(validation.error);
+            window.secureLogout();
+            return;
+          }
+          initSessionMonitor();
+          await loadDashboard();
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        window.location.href = '/login?error=auth_failed';
+      } finally {
+        document.body.classList.remove('loading');
+      }
+    }
+    checkAuth();
+    function escapeHtml(text) { if (!text) return ''; var div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+    async function updateNavbar() {
+      const navbarActions = document.getElementById('navbarActions'); const user = await getCurrentUser();
+      let actionsHTML = `<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="تبديل السمة"><span>☀️</span></button><select class="lang-switch" id="lang-switch-select" onchange="setLanguage(this.value)"><option value="ar">العربية</option><option value="en">English</option></select>`;
+      if (user) { const canAccessPanel = ['admin','manager','moderator'].includes(user.role); actionsHTML += `<a href="/dashboard" class="btn btn-secondary">لوحة التحكم</a><a href="/sessions" class="btn btn-secondary">حجوزاتي</a>${canAccessPanel ? '<a href="/panel" class="btn btn-secondary">لوحة الأدمن</a>' : ''}<button id="logout-btn" class="btn btn-secondary">تسجيل خروج</button>`; document.getElementById('user-avatar').textContent = user.username.charAt(0).toUpperCase(); document.getElementById('welcome-message').textContent = 'مرحباً، ' + user.username; document.getElementById('user-email').textContent = user.email; }
+      navbarActions.innerHTML = actionsHTML;
+      document.getElementById('lang-switch-select')?.addEventListener('change', e => setLanguage(e.target.value));
+      document.getElementById('logout-btn')?.addEventListener('click', () => logout());
+    }
+    async function loadDashboard() {
+      try { await updateNavbar(); const [freeProducts, paidProducts, tickets, bookings] = await Promise.all([apiRequest('/api/products/free').catch(() => ({ products: [] })), apiRequest('/api/products/paid').catch(() => ({ products: [] })), apiRequest('/api/support/tickets').catch(() => ({ tickets: [] })), apiRequest('/api/sessions/my').catch(() => ({ sessions: [] }))]);
+        document.getElementById('free-products-count').textContent = freeProducts.products.length; document.getElementById('paid-products-count').textContent = paidProducts.products.length; document.getElementById('tickets-count').textContent = tickets.tickets.length;
+        document.getElementById('open-tickets').textContent = tickets.tickets.filter(t => t.status === 'open').length;
+        document.getElementById('recent-tickets').innerHTML = tickets.tickets.length ? tickets.tickets.slice(0, 5).map(t => '<div class="ticket-card"><div class="ticket-header"><div><div class="ticket-title">' + escapeHtml(t.title) + '</div><div class="ticket-meta">' + new Date(t.created_at).toLocaleDateString('ar') + '</div></div><div class="d-flex gap-1"><span class="ticket-priority ' + escapeHtml(t.priority) + '">' + escapeHtml(t.priority) + '</span><span class="ticket-status ' + escapeHtml(t.status) + '">' + escapeHtml(t.status) + '</span></div></div></div>').join('') : '<p class="text-muted">لا توجد تذاكر</p>';
+        document.getElementById('recent-bookings').innerHTML = (!bookings.sessions || bookings.sessions.length === 0) ? '<p class="text-muted">لا توجد حجوزات</p>' : bookings.sessions.slice(0, 5).map(b => '<div class="ticket-card"><div class="ticket-header"><div><div class="ticket-title">' + escapeHtml(b.session_type) + '</div><div class="ticket-meta">' + escapeHtml(b.preferred_date) + ' - ' + escapeHtml(b.preferred_time) + '</div></div><span class="ticket-status ' + escapeHtml(b.status) + '">' + escapeHtml(b.status) + '</span></div></div>').join('');
+        const allProducts = await apiRequest('/api/products').catch(() => ({ products: [] }));
+        var productsHtml = '';
+        for (var i = 0; i < Math.min(allProducts.products.length, 4); i++) {
+          var p = allProducts.products[i];
+          var price = p.is_free ? 'مجاني' : '$0';
+          var btn = p.is_free ? '<button class="btn btn-primary btn-sm" onclick="downloadProduct(' + p.id + ')">تحميل</button>' : '<button class="btn btn-primary btn-sm" onclick="purchaseProduct(' + p.id + ')">شراء</button>';
+          var badge = p.is_free ? 'free' : 'paid';
+          var badgeText = p.is_free ? 'مجاني' : 'مدفوع';
+          productsHtml += '<div class="product-card"><div class="product-image">📦</div><div class="product-content"><span class="product-badge ' + badge + '">' + badgeText + '</span><h3>' + escapeHtml(p.name_ar || p.name) + '</h3><p>' + escapeHtml(p.description_ar || p.description || 'منتج عالي الجودة') + '</p><div class="product-price">' + price + '</div>' + btn + '</div></div>';
+        }
+        document.getElementById('products-grid').innerHTML = productsHtml;
+      } catch (error) { console.error('Error:', error); showAlert('خطأ في تحميل البيانات', 'error'); }
+    }
+
+    // Close menu when clicking nav links
+  </script>
+  
+  <!-- Broadcast Message Popup -->
+  <div id="broadcastPopup" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: var(--color-bg-secondary); border-radius: 12px; padding: 24px; max-width: 450px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 id="broadcastTitle" style="margin: 0; color: var(--color-primary); font-size: 18px;"></h3>
+        <button onclick="closeBroadcastPopup()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--color-text-muted);">✕</button>
+      </div>
+      <div id="broadcastMessage" style="color: var(--color-text); margin-bottom: 20px; line-height: 1.6; font-size: 14px; word-wrap: break-word; white-space: pre-wrap;"></div>
+      <div style="margin-top: 16px; text-align: center;">
+        <button onclick="closeBroadcastPopup()" style="padding: 10px 32px; background: var(--color-primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">موافق</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showBroadcastPopup(title, message) {
+      document.getElementById('broadcastTitle').textContent = title;
+      document.getElementById('broadcastMessage').innerHTML = message.replace(/\n/g, '<br>');
+      document.getElementById('broadcastPopup').style.display = 'flex';
+    }
+    
+    function closeBroadcastPopup() {
+      document.getElementById('broadcastPopup').style.display = 'none';
+    }
+    
+    // ===== HAMBURGER MENU =====
+    (function() {
+      var hamburger = document.getElementById('hamburger');
+      var nav = document.getElementById('navbarNav');
+      var actions = document.getElementById('navbarActions');
+      if (!hamburger || !nav) return;
+      var backdrop = document.createElement('div');
+      backdrop.className = 'menu-backdrop';
+      document.body.appendChild(backdrop);
+      var menuOpen = false;
+      function openMenu() {
+        menuOpen = true;
+        hamburger.classList.add('active');
+        hamburger.setAttribute('aria-expanded', 'true');
+        nav.classList.add('menu-open');
+        if (actions) actions.classList.add('menu-open');
+        backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeMenu() {
+        menuOpen = false;
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        nav.classList.remove('menu-open');
+        if (actions) actions.classList.remove('menu-open');
+        backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      hamburger.addEventListener('click', function(e) { e.stopPropagation(); if (menuOpen) closeMenu(); else openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      nav.querySelectorAll('.nav-link').forEach(function(link) { link.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && menuOpen) { closeMenu(); hamburger.focus(); } });
+
+      // Swipe to close
+      var startX = 0;
+      nav.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; });
+      nav.addEventListener('touchend', function(e) {
+        var endX = e.changedTouches[0].clientX;
+        if (startX - endX > 50) closeMenu();
+      });
+    })();
+
+    // Notification banner
+    document.addEventListener('DOMContentLoaded', function() {
+      const notificationClosed = localStorage.getItem('notificationClosed');
+      const notificationTime = localStorage.getItem('notificationTime');
+      const now = Date.now();
+      
+      if (notificationTime && (now - parseInt(notificationTime)) > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem('notificationClosed');
+        localStorage.removeItem('notificationTime');
+      }
+      
+      if (!notificationClosed) {
+        document.getElementById('mainNotification').style.display = 'flex';
+      }
+    });
+    
+    function closeNotification() {
+      document.getElementById('mainNotification').style.display = 'none';
+      localStorage.setItem('notificationClosed', 'true');
+      localStorage.setItem('notificationTime', Date.now().toString());
+    }
+  </script>
+  <script src="/js/push-notifications.js"></script>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>من نحن - ELECTRON VISION</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <style>
+    /* ========================================
+       ELECTRON VISION DESIGN SYSTEM
+       ======================================== */
+    :root {
+      --color-primary: #6366f1;
+      --color-primary-hover: #4f46e5;
+      --color-primary-light: #818cf8;
+      --color-primary-dark: #4338ca;
+      --color-primary-alpha: rgba(99, 102, 241, 0.1);
+      --color-secondary: #10b981;
+      --color-secondary-hover: #059669;
+      --color-secondary-light: #34d399;
+      --color-accent: #f59e0b;
+      --color-accent-hover: #d97706;
+      --color-bg-primary: #0f0f23;
+      --color-bg-secondary: #1a1a2e;
+      --color-bg-tertiary: #16213e;
+      --color-bg-card: rgba(26, 26, 46, 0.8);
+      --color-bg-glass: rgba(255, 255, 255, 0.05);
+      --color-bg-glass-hover: rgba(255, 255, 255, 0.1);
+      --color-text-primary: #f8fafc;
+      --color-text-secondary: #94a3b8;
+      --color-text-muted: #64748b;
+      --color-text-inverse: #0f172a;
+      --color-border: rgba(255, 255, 255, 0.1);
+      --color-border-light: rgba(255, 255, 255, 0.05);
+      --color-border-focus: var(--color-primary);
+      --color-success: #10b981;
+      --color-success-bg: rgba(16, 185, 129, 0.15);
+      --color-error: #ef4444;
+      --color-error-bg: rgba(239, 68, 68, 0.15);
+      --color-warning: #f59e0b;
+      --color-warning-bg: rgba(245, 158, 11, 0.15);
+      --color-info: #3b82f6;
+      --color-info-bg: rgba(59, 130, 246, 0.15);
+      --font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-size-xs: 0.75rem;
+      --font-size-sm: 0.875rem;
+      --font-size-base: 1rem;
+      --font-size-lg: 1.125rem;
+      --font-size-xl: 1.25rem;
+      --font-size-2xl: 1.5rem;
+      --font-size-3xl: 1.875rem;
+      --font-size-4xl: 2.25rem;
+      --font-size-5xl: 3rem;
+      --font-size-6xl: 3.75rem;
+      --font-weight-light: 300;
+      --font-weight-regular: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      --font-weight-extrabold: 800;
+      --line-height-tight: 1.25;
+      --line-height-normal: 1.5;
+      --line-height-relaxed: 1.75;
+      --spacing-0: 0;
+      --spacing-1: 0.25rem;
+      --spacing-2: 0.5rem;
+      --spacing-3: 0.75rem;
+      --spacing-4: 1rem;
+      --spacing-5: 1.25rem;
+      --spacing-6: 1.5rem;
+      --spacing-8: 2rem;
+      --spacing-10: 2.5rem;
+      --spacing-12: 3rem;
+      --spacing-16: 4rem;
+      --spacing-20: 5rem;
+      --spacing-24: 6rem;
+      --radius-none: 0;
+      --radius-sm: 0.25rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-2xl: 1.5rem;
+      --radius-3xl: 2rem;
+      --radius-full: 9999px;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+      --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+      --shadow-glow-secondary: 0 0 40px rgba(16, 185, 129, 0.3);
+      --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+      --transition-fast: 150ms ease;
+      --transition-base: 250ms ease;
+      --transition-slow: 350ms ease;
+      --transition-smooth: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+      --z-dropdown: 1000;
+      --z-sticky: 1020;
+      --z-fixed: 1030;
+      --z-modal-backdrop: 1040;
+      --z-modal: 1050;
+      --z-popover: 1060;
+      --z-tooltip: 1070;
+      --container-max-width: 1280px;
+      --container-padding: 1.5rem;
+      --navbar-height: 80px;
+      --navbar-bg: rgba(15, 15, 35, 0.95);
+      --navbar-border: var(--color-border);
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-blur: blur(20px);
+    }
+    [data-theme="light"] {
+      --color-bg-primary: #f8fafc;
+      --color-bg-secondary: #ffffff;
+      --color-bg-tertiary: #f1f5f9;
+      --color-bg-card: rgba(255, 255, 255, 0.9);
+      --color-bg-glass: rgba(0, 0, 0, 0.03);
+      --color-bg-glass-hover: rgba(0, 0, 0, 0.06);
+      --color-text-primary: #0f172a;
+      --color-text-secondary: #475569;
+      --color-text-muted: #94a3b8;
+      --color-text-inverse: #f8fafc;
+      --color-border: rgba(0, 0, 0, 0.1);
+      --color-border-light: rgba(0, 0, 0, 0.05);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      --navbar-bg: rgba(248, 250, 252, 0.95);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body {
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-regular);
+      line-height: var(--line-height-normal);
+      color: var(--color-text-primary);
+      background-color: var(--color-bg-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--color-bg-secondary); }
+    ::-webkit-scrollbar-thumb { background: var(--color-primary); border-radius: var(--radius-full); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--color-primary-hover); }
+    h1, h2, h3, h4, h5, h6 { font-weight: var(--font-weight-bold); line-height: var(--line-height-tight); color: var(--color-text-primary); }
+    h1 { font-size: var(--font-size-5xl); }
+    h2 { font-size: var(--font-size-4xl); }
+    h3 { font-size: var(--font-size-3xl); }
+    h4 { font-size: var(--font-size-2xl); }
+    h5 { font-size: var(--font-size-xl); }
+    h6 { font-size: var(--font-size-lg); }
+    p { margin-bottom: var(--spacing-4); color: var(--color-text-secondary); }
+    a { color: var(--color-primary); text-decoration: none; transition: color var(--transition-fast); }
+    a:hover { color: var(--color-primary-hover); }
+    .container { width: 100%; max-width: var(--container-max-width); margin: 0 auto; padding: 0 var(--container-padding); }
+    .section { padding: var(--spacing-20) 0; }
+    .text-center { text-align: center; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-2);
+      padding: var(--spacing-3) var(--spacing-6);
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      line-height: 1;
+      text-decoration: none;
+      border: 2px solid transparent;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all var(--transition-smooth);
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    .btn:hover::before { left: 100%; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+      color: white;
+      border-color: var(--color-primary);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary-dark));
+      border-color: var(--color-primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+    .btn-secondary {
+      background: var(--color-bg-glass);
+      color: var(--color-text-primary);
+      border-color: var(--color-border);
+      backdrop-filter: var(--glass-blur);
+    }
+    .btn-secondary:hover {
+      background: var(--color-bg-glass-hover);
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    .btn-lg { padding: var(--spacing-4) var(--spacing-8); font-size: var(--font-size-lg); }
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--navbar-height);
+      background: var(--navbar-bg);
+      backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--navbar-border);
+      z-index: var(--z-fixed);
+    }
+    .navbar-container { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+    .navbar-brand { display: flex; align-items: center; gap: var(--spacing-3); }
+    .navbar-brand img { height: 50px; width: auto; object-fit: contain; }
+    @media (min-width: 993px) {
+      .navbar-nav { display: flex; align-items: center; gap: var(--spacing-2); list-style: none; }
+      .navbar-nav a {
+        display: flex;
+        align-items: center;
+        padding: var(--spacing-2) var(--spacing-4);
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text-secondary);
+        border-radius: var(--radius-lg);
+        transition: all var(--transition-fast);
+      }
+      .navbar-nav a:hover, .navbar-nav a.active {
+        color: var(--color-primary);
+        background: var(--color-primary-alpha);
+      }
+      .navbar-actions { display: flex; align-items: center; gap: var(--spacing-3); }
+    }
+
+    .hero {
+      position: relative;
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(var(--navbar-height) + var(--spacing-12)) var(--spacing-6) var(--spacing-12);
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+        var(--color-bg-primary);
+      overflow: hidden;
+    }
+    .hero-content { text-align: center; max-width: 800px; position: relative; z-index: 1; }
+    .hero h1 {
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-weight: var(--font-weight-extrabold);
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--spacing-6);
+    }
+    .hero p { font-size: var(--font-size-xl); color: var(--color-text-secondary); margin: 0; }
+    .features { padding: var(--spacing-20) 0; background: var(--color-bg-secondary); }
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-8);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .glass-card h2 {
+      font-size: var(--font-size-2xl);
+      color: var(--color-primary);
+      margin-bottom: var(--spacing-3);
+    }
+    .glass-card p { margin-bottom: var(--spacing-4); }
+    .glass-card ul { list-style: none; }
+    .glass-card li {
+      padding: var(--spacing-2) 0;
+      font-size: var(--font-size-base);
+      color: var(--color-text-secondary);
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    .glass-card li:last-child { border-bottom: none; }
+    .glass-card strong { color: var(--color-text-primary); }
+    .footer {
+      background: var(--color-bg-secondary);
+      border-top: 1px solid var(--color-border);
+      padding: var(--spacing-16) 0 var(--spacing-8);
+    }
+    .footer-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--spacing-12);
+      margin-bottom: var(--spacing-12);
+    }
+    .footer-brand img { height: 60px; width: auto; margin-bottom: var(--spacing-4); }
+    .footer-brand p { font-size: var(--font-size-sm); color: var(--color-text-muted); margin: 0; }
+    .footer-links h4 { font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); margin-bottom: var(--spacing-4); color: var(--color-text-primary); }
+    .footer-links ul { list-style: none; }
+    .footer-links li { margin-bottom: var(--spacing-2); }
+    .footer-links a { font-size: var(--font-size-sm); color: var(--color-text-muted); transition: all var(--transition-fast); }
+    .footer-links a:hover { color: var(--color-primary); padding-right: var(--spacing-2); }
+    .footer-bottom { text-align: center; padding-top: var(--spacing-8); border-top: 1px solid var(--color-border); }
+    .footer-bottom p { font-size: var(--font-size-sm); color: var(--color-text-muted); margin: 0; }
+    .mb-1 { margin-bottom: var(--spacing-1); }
+    .mb-2 { margin-bottom: var(--spacing-2); }
+    .mb-3 { margin-bottom: var(--spacing-3); }
+    .mb-4 { margin-bottom: var(--spacing-4); }
+    .mb-5 { margin-bottom: var(--spacing-5); }
+    .mb-6 { margin-bottom: var(--spacing-6); }
+    .mt-4 { margin-top: var(--spacing-4); }
+    @media (max-width: 1024px) {
+      :root { 
+        --navbar-height: 70px;
+        --font-size-4xl: clamp(1.75rem, 4vw, 2.25rem);
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root { 
+        --navbar-height: 70px;
+        --font-size-4xl: clamp(1.5rem, 5vw, 2rem);
+        --font-size-3xl: clamp(1.25rem, 4vw, 1.5rem);
+        --spacing-16: clamp(2rem, 5vw, 3rem);
+        --spacing-12: clamp(1.5rem, 4vw, 2rem);
+      }
+      .hero h1 { font-size: var(--font-size-4xl); }
+      .hero p { font-size: clamp(0.875rem, 2vw, 1rem); }
+      .footer-content { grid-template-columns: 1fr; gap: var(--spacing-8); }
+      .glass-card { padding: clamp(1rem, 4vw, 1.5rem); }
+    }
+
+    @media (max-width: 480px) {
+      :root { 
+        --container-padding: 1rem;
+        --font-size-4xl: clamp(1.25rem, 6vw, 1.5rem);
+      }
+      .hero h1 { font-size: var(--font-size-4xl); }
+      .navbar-brand img { height: clamp(35px, 10vw, 50px); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-container">
+        <a href="/" class="navbar-brand">
+          <img src="/logo.png" alt="ELECTRON VISION" class="navbar-logo">
+          <span class="navbar-brand-text">ELECTRON VISION</span>
+        </a>
+
+        <button class="hamburger" id="hamburger" aria-label="القائمة" aria-expanded="false" aria-controls="navbarNav navbarActions">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <ul class="navbar-nav" id="navbarNav">
+          <li><a href="/" class="nav-link"><span class="nav-icon">🏠</span> الرئيسية</a></li>
+          <li><a href="/about" class="nav-link active"><span class="nav-icon">👥</span> من نحن</a></li>
+          <li><a href="/services" class="nav-link"><span class="nav-icon">⚙️</span> الخدمات</a></li>
+          <li><a href="/products" class="nav-link"><span class="nav-icon">📦</span> المنتجات</a></li>
+          <li><a href="/sessions" class="nav-link"><span class="nav-icon">📅</span> الحجوزات</a></li>
+          <li><a href="/support" class="nav-link"><span class="nav-icon">🎫</span> الدعم الفني</a></li>
+          <li><a href="/contact" class="nav-link"><span class="nav-icon">💬</span> تواصل معنا</a></li>
+        </ul>
+
+        <div class="navbar-actions" id="navbarActions">
+          <button class="theme-toggle" onclick="toggleTheme()" title="تبديل السمة"><span>🌙</span></button>
+          <select class="lang-switch" onchange="setLanguage(this.value)">
+            <option value="ar" selected>العربية</option>
+            <option value="en">English</option>
+          </select>
+          <a href="/login" class="btn btn-secondary login-btn" id="loginBtn">تسجيل دخول</a>
+          <a href="/register" class="btn btn-primary register-btn" id="registerBtn">تسجيل</a>
+          <a href="/dashboard" class="btn btn-primary dashboard-btn" id="dashboardBtn" style="display: none;">
+            <i class="fas fa-home"></i> لوحة التحكم
+          </a>
+          <div class="user-menu" id="userMenu" style="display: none;">
+            <button class="user-menu-toggle" onclick="toggleUserMenu()">
+              <span class="user-initial" id="userInitial">U</span>
+              <span class="user-name" id="userName"></span>
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+              <a href="/dashboard" class="dropdown-item"><i class="fas fa-user"></i> لوحة التحكم</a>
+              <a href="/profile" class="dropdown-item"><i class="fas fa-cog"></i> الإعدادات</a>
+              <hr class="dropdown-divider">
+              <a href="#" class="dropdown-item logout-link"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a>
+            </div>
+          </div>
+          <button class="btn btn-danger logout-btn" id="logoutBtn" style="display: none;" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> خروج
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- About Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>من نحن</h1>
+        <p>شركة ELECTRON VISION هي شركة رائدة في مجال التكنولوجيا والابتكار</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Content -->
+  <section class="features">
+    <div class="container">
+      <div class="glass-card">
+        <h2>رؤيتنا</h2>
+        <p>
+          نسعى لأن نكون الشركة الرائدة في تقديم الحلول التقنية المتقدمة في منطقة الشرق الأوسط，
+          من خلال تقديم منتجات وخدمات عالية الجودة تلبي احتياجات العملاء المتنوعة.
+        </p>
+        
+        <h2 class="mt-4">رسالتنا</h2>
+        <p>
+          نلتزم بتقديم أحدث التقنيات والحلول المبتكرة التي تساعد عملاءنا على تحقيق أهدافهم，
+          مع التركيز على الجودة والأمان ورضا العملاء.
+        </p>
+        
+        <h2 class="mt-4">قيمنا</h2>
+        <ul>
+          <li>🔹 <strong>الابتكار:</strong> نسعى دائماً للتميز والابتكار في كل ما نقدمه</li>
+          <li>🔹 <strong>الجودة:</strong> نلتزم بأعلى معايير الجودة في منتجاتنا وخدماتنا</li>
+          <li>🔹 <strong>الأمان:</strong> نولي أهمية قصوى لأمان بيانات عملائنا</li>
+          <li>🔹 <strong>الالتزام:</strong> نلتزم بوعودنا ونحترم مواعيدنا</li>
+          <li>🔹 <strong>العمل:</strong> عملاؤنا هم محور كل ما نقوم به</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div>
+          <div class="footer-brand">
+            <img src="/logo.png" alt="ELECTRON VISION">
+          </div>
+          <p>شركة رائدة في مجال التكنولوجيا والابتكار.</p>
+        </div>
+        <div class="footer-links">
+          <h4>روابط سريعة</h4>
+          <ul>
+            <li><a href="/about">من نحن</a></li>
+            <li><a href="/services">الخدمات</a></li>
+            <li><a href="/products">المنتجات</a></li>
+            <li><a href="/contact">اتصل بنا</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>جميع الحقوق محفوظة © 2026 ELECTRON VISION</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    // ===== HAMBURGER MENU =====
+    (function() {
+      var hamburger = document.getElementById('hamburger');
+      var nav = document.getElementById('navbarNav');
+      var actions = document.getElementById('navbarActions');
+      if (!hamburger || !nav) return;
+      var backdrop = document.createElement('div');
+      backdrop.className = 'menu-backdrop';
+      document.body.appendChild(backdrop);
+      var menuOpen = false;
+      function openMenu() {
+        menuOpen = true;
+        hamburger.classList.add('active');
+        hamburger.setAttribute('aria-expanded', 'true');
+        nav.classList.add('menu-open');
+        if (actions) actions.classList.add('menu-open');
+        backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeMenu() {
+        menuOpen = false;
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        nav.classList.remove('menu-open');
+        if (actions) actions.classList.remove('menu-open');
+        backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      hamburger.addEventListener('click', function(e) { e.stopPropagation(); if (menuOpen) closeMenu(); else openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      nav.querySelectorAll('.nav-link, a').forEach(function(link) { link.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && menuOpen) { closeMenu(); hamburger.focus(); } });
+    })();
+
+    document.querySelectorAll('.navbar-nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('navbarNav')?.classList.remove('active');
+        document.getElementById('navbarActions')?.classList.remove('active');
+      });
+    });
+  </script>
+  <script type="text/javascript" src="/js/auth.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/socket-client.js"></script>
+  <script src="/js/push-notifications.js"></script>
+  <script>
+function toggleUserMenu() {
+  const dropdown = document.getElementById('userDropdown');
+  if (dropdown) dropdown.classList.toggle('show');
+}
+document.addEventListener('auth:change', function(e) {
+  const state = e.detail;
+  if (state.isAuthenticated && state.user) {
+    const userName = document.getElementById('userName');
+    const userInitial = document.getElementById('userInitial');
+    if (userName) userName.textContent = state.user.username || state.user.email || '';
+    if (userInitial) userInitial.textContent = (state.user.username || state.user.email || 'U')[0].toUpperCase();
+  }
+});
+document.addEventListener('click', function(e) {
+  const userMenu = document.querySelector('.user-menu');
+  const userDropdown = document.getElementById('userDropdown');
+  if (userMenu && !userMenu.contains(e.target)) {
+    userDropdown && userDropdown.classList.remove('show');
+  }
+  if (e.target.classList.contains('logout-link') || e.target.closest('.logout-link')) {
+    e.preventDefault();
+    logout();
+  }
+});
+</script>
+<style>
+.user-menu { position: relative; display: none; }
+.user-menu-toggle { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); cursor: pointer; font-family: inherit; font-size: 14px; }
+.user-initial, .user-avatar { 
+  width: 36px; 
+  height: 36px; 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-weight: 700; 
+  font-size: 14px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.user-initial:hover, .user-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.user-dropdown { display: none; position: absolute; top: 100%; left: 0; min-width: 160px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1000; margin-top: 4px; }
+.user-dropdown.show { display: block; }
+.dropdown-item { display: block; padding: 10px 14px; color: var(--color-text); text-decoration: none; font-size: 14px; }
+.dropdown-item:hover { background: var(--color-bg-secondary); }
+.logout-btn { display: none; padding: 8px 16px; font-size: 14px; border-radius: var(--radius-lg); }
+.logout-btn:hover { background: #dc2626; }
+.dashboard-btn { display: none; padding: 8px 16px; font-size: 14px; border-radius: var(--radius-lg); }
+</style>
+
+<!-- Broadcast Message Popup -->
+<div id="broadcastPopup" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+  <div style="background: var(--color-bg-secondary); border-radius: 12px; padding: 24px; max-width: 450px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 id="broadcastTitle" style="margin: 0; color: var(--color-primary); font-size: 18px;"></h3>
+      <button onclick="closeBroadcastPopup()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--color-text-muted);">✕</button>
+    </div>
+    <div id="broadcastMessage" style="color: var(--color-text); margin-bottom: 20px; line-height: 1.6; font-size: 14px; word-wrap: break-word; white-space: pre-wrap;"></div>
+    <div style="margin-top: 16px; text-align: center;">
+      <button onclick="closeBroadcastPopup()" style="padding: 10px 32px; background: var(--color-primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">موافق</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showBroadcastPopup(title, message) {
+  document.getElementById('broadcastTitle').textContent = title;
+  document.getElementById('broadcastMessage').innerHTML = message.replace(/\n/g, '<br>');
+  document.getElementById('broadcastPopup').style.display = 'flex';
+}
+
+function closeBroadcastPopup() {
+  document.getElementById('broadcastPopup').style.display = 'none';
+}
+</script>
+</body>
+</html>

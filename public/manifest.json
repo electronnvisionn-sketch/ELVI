@@ -1,0 +1,45 @@
+{
+  "name": "ELECTRON VISION",
+  "short_name": "ElectronVision",
+  "description": "شركة الإلكترون فيجن - حلول تقنية متقدمة",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f23",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "الرئيسية",
+      "short_name": "رئيسية",
+      "description": "الصفحة الرئيسية",
+      "url": "/"
+    },
+    {
+      "name": "المنتجات",
+      "short_name": "منتجات",
+      "description": "تصفح المنتجات",
+      "url": "/products"
+    },
+    {
+      "name": "الحجوزات",
+      "short_name": "حجوزات",
+      "description": "احجز جلسة",
+      "url": "/sessions"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

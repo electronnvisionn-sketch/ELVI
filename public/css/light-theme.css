@@ -1,0 +1,479 @@
+/**
+ * ELECTRON VISION - Light Theme Design System
+ * Soft, Pleasant Color Palette
+ * Pink, Blue, Green & White
+ */
+
+/* ========================================
+   LIGHT THEME COLOR PALETTE
+   ======================================== */
+
+:root {
+  /* Light Pink - Soft & Warm */
+  --light-pink-50: #fdf2f8;
+  --light-pink-100: #fce7f3;
+  --light-pink-200: #fbcfe8;
+  --light-pink-300: #f9a8d4;
+  --light-pink-400: #f472b6;
+  --light-pink-500: #ec4899;
+  --light-pink: var(--light-pink-400);
+  
+  /* Light Blue - Calm & Trust */
+  --light-blue-50: #eff6ff;
+  --light-blue-100: #dbeafe;
+  --light-blue-200: #bfdbfe;
+  --light-blue-300: #93c5fd;
+  --light-blue-400: #60a5fa;
+  --light-blue-500: #3b82f6;
+  --light-blue: var(--light-blue-400);
+  
+  /* Light Green - Fresh & Natural */
+  --light-green-50: #f0fdf4;
+  --light-green-100: #dcfce7;
+  --light-green-200: #bbf7d0;
+  --light-green-300: #86efac;
+  --light-green-400: #4ade80;
+  --light-green-500: #22c55e;
+  --light-green: var(--light-green-400);
+  
+  /* White & Neutrals */
+  --white: #ffffff;
+  --white-50: #fafafa;
+  --white-100: #f5f5f5;
+  --white-200: #e5e5e5;
+  --white-300: #d4d4d4;
+  
+  /* Text Colors */
+  --text-dark: #1a1a2e;
+  --text-dark-2: #2d2d44;
+  --text-gray: #52525b;
+  --text-gray-2: #71717a;
+  --text-light: #a1a1aa;
+  
+  /* Override Dark Theme Variables for Light Mode */
+  [data-theme="light"] {
+    --bg-dark: var(--white-50);
+    --bg-darker: var(--white-100);
+    --bg-primary: var(--white);
+    --bg-secondary: var(--white-50);
+    --bg-card: var(--white);
+    --bg-card-hover: var(--white-100);
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(59, 130, 246, 0.1);
+    
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-color-hover: rgba(0, 0, 0, 0.15);
+    
+    --text-primary: var(--text-dark);
+    --text-secondary: var(--text-dark-2);
+    --text-muted: var(--text-gray-2);
+    
+    --color-primary: var(--light-blue-500);
+    --color-primary-hover: var(--light-blue-600);
+    --color-secondary: var(--light-pink-500);
+    --color-accent: var(--light-pink-400);
+    
+    --success: var(--light-green-500);
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: var(--light-blue-500);
+  }
+}
+
+/* ========================================
+   LIGHT THEME - NAVBAR
+   ======================================== */
+
+[data-theme="light"] .navbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  box-shadow: 0 2px 20px rgba(59, 130, 246, 0.08);
+}
+
+[data-theme="light"] .navbar:hover {
+  background: rgba(255, 255, 255, 0.98);
+}
+
+[data-theme="light"] .navbar-logo {
+  filter: none;
+}
+
+[data-theme="light"] .navbar-brand-text {
+  background: linear-gradient(135deg, var(--light-blue-500), var(--light-pink-400), var(--light-green-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .navbar-nav .nav-link {
+  color: var(--text-gray);
+  font-weight: 500;
+}
+
+[data-theme="light"] .navbar-nav .nav-link:hover {
+  color: var(--light-blue-500);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+[data-theme="light"] .navbar-nav .nav-link.active {
+  color: var(--light-blue-600);
+  background: rgba(59, 130, 246, 0.12);
+}
+
+[data-theme="light"] .theme-toggle {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.15);
+  color: var(--text-dark);
+}
+
+[data-theme="light"] .theme-toggle:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: var(--light-blue-400);
+}
+
+[data-theme="light"] .lang-switch {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.15);
+  color: var(--text-dark);
+}
+
+[data-theme="light"] .lang-switch option {
+  background: var(--white);
+  color: var(--text-dark);
+}
+
+[data-theme="light"] .hamburger {
+  background: rgba(59, 130, 246, 0.06);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="light"] .hamburger::before {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.15));
+}
+
+[data-theme="light"] .hamburger:hover {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow:
+    0 0 20px rgba(59, 130, 246, 0.12),
+    0 0 40px rgba(99, 102, 241, 0.06);
+}
+
+[data-theme="light"] .hamburger span {
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+}
+
+[data-theme="light"] .hamburger:hover span {
+  background: linear-gradient(90deg, #2563eb, #818cf8);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+[data-theme="light"] .hamburger.active {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow:
+    0 0 25px rgba(59, 130, 246, 0.15),
+    0 0 50px rgba(99, 102, 241, 0.08);
+}
+
+[data-theme="light"] .hamburger.active span:nth-child(1),
+[data-theme="light"] .hamburger.active span:nth-child(3) {
+  background: #1e3a5f;
+  box-shadow: 0 0 6px rgba(30, 58, 95, 0.3);
+}
+
+[data-theme="light"] .hamburger.active:hover span:nth-child(1),
+[data-theme="light"] .hamburger.active:hover span:nth-child(3) {
+  background: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+[data-theme="light"] .menu-backdrop {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .navbar-actions .btn-secondary {
+  background: var(--white);
+  border-color: rgba(59, 130, 246, 0.2);
+  color: var(--text-dark);
+}
+
+[data-theme="light"] .navbar-actions .btn-secondary:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--light-blue-400);
+}
+
+[data-theme="light"] .navbar-actions .btn-primary {
+  background: linear-gradient(135deg, var(--light-blue-500), var(--light-blue-600));
+  color: var(--white);
+}
+
+/* Light Theme - Mobile Menu Panel */
+@media (max-width: 992px) {
+  [data-theme="light"] .navbar-nav {
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.99) 0%, rgba(241, 245, 249, 0.99) 100%);
+    border-left: 1px solid rgba(59, 130, 246, 0.1);
+    box-shadow:
+      -20px 0 60px rgba(0, 0, 0, 0.08),
+      inset 1px 0 0 rgba(59, 130, 246, 0.05);
+  }
+  
+  [data-theme="light"] .navbar-nav::after {
+    background: radial-gradient(ellipse at 50% -30%, rgba(59, 130, 246, 0.06) 0%, transparent 70%);
+  }
+  
+  [data-theme="light"] .navbar-nav .nav-link {
+    color: #1e3a5f;
+  }
+  
+  [data-theme="light"] .navbar-nav .nav-link .nav-icon {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.12);
+  }
+  
+  [data-theme="light"] .navbar-nav .nav-link:hover,
+  [data-theme="light"] .navbar-nav .nav-link.active {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+  }
+  
+  [data-theme="light"] .navbar-nav .nav-link:hover .nav-icon,
+  [data-theme="light"] .navbar-nav .nav-link.active .nav-icon {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.25);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.1);
+  }
+  
+  [data-theme="light"] .navbar-actions {
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.99) 100%);
+    border-top: 1px solid rgba(59, 130, 246, 0.1);
+    border-left: 1px solid rgba(59, 130, 246, 0.06);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.06);
+  }
+}
+
+/* ========================================
+   LIGHT THEME - CARDS & SECTIONS
+   ======================================== */
+
+[data-theme="light"] .hero {
+  background: linear-gradient(135deg, var(--white-50) 0%, var(--light-blue-50) 50%, var(--light-pink-50) 100%);
+}
+
+[data-theme="light"] .hero::before {
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(74, 222, 128, 0.06) 0%, transparent 40%);
+}
+
+[data-theme="light"] .card,
+[data-theme="light"] .feature-card,
+[data-theme="light"] .service-card,
+[data-theme="light"] .product-card,
+[data-theme="light"] .glass-card {
+  background: var(--white);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.08);
+}
+
+[data-theme="light"] .card:hover,
+[data-theme="light"] .feature-card:hover,
+[data-theme="light"] .service-card:hover {
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.12);
+  transform: translateY(-4px);
+}
+
+[data-theme="light"] .features,
+[data-theme="light"] .services,
+[data-theme="light"] .products {
+  background: var(--white-50);
+}
+
+[data-theme="light"] .footer {
+  background: var(--white);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ========================================
+   LIGHT THEME - BUTTONS
+   ======================================== */
+
+[data-theme="light"] .btn-primary {
+  background: linear-gradient(135deg, var(--light-blue-500), var(--light-blue-600));
+  color: var(--white);
+  border: none;
+}
+
+[data-theme="light"] .btn-primary:hover {
+  background: linear-gradient(135deg, var(--light-blue-600), var(--light-blue-700));
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="light"] .btn-secondary {
+  background: var(--white);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: var(--text-dark);
+}
+
+[data-theme="light"] .btn-secondary:hover {
+  background: var(--light-blue-50);
+  border-color: var(--light-blue-400);
+}
+
+/* ========================================
+   LIGHT THEME - FORMS
+   ======================================== */
+
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-select,
+[data-theme="light"] .form-textarea {
+  background: var(--white);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--text-dark);
+}
+
+[data-theme="light"] .form-input:focus,
+[data-theme="light"] .form-select:focus,
+[data-theme="light"] .form-textarea:focus {
+  border-color: var(--light-blue-400);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ========================================
+   LIGHT THEME - BADGES & TAGS
+   ======================================== */
+
+[data-theme="light"] .badge,
+[data-theme="light"] .tag {
+  background: var(--light-blue-100);
+  color: var(--light-blue-600);
+}
+
+[data-theme="light"] .badge-pink {
+  background: var(--light-pink-100);
+  color: var(--light-pink-500);
+}
+
+[data-theme="light"] .badge-green {
+  background: var(--light-green-100);
+  color: var(--light-green-500);
+}
+
+/* ========================================
+   LIGHT THEME - USER MENU
+   ======================================== */
+
+[data-theme="light"] .user-menu-toggle {
+  background: var(--white);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--text-dark);
+}
+
+[data-theme="light"] .user-dropdown {
+  background: var(--white);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="light"] .user-dropdown .dropdown-item {
+  color: var(--text-dark);
+}
+
+[data-theme="light"] .user-dropdown .dropdown-item:hover {
+  background: var(--light-blue-50);
+}
+
+/* ========================================
+   LIGHT THEME - MODALS
+   ======================================== */
+
+[data-theme="light"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .modal {
+  background: var(--white);
+  box-shadow: 0 25px 50px rgba(59, 130, 246, 0.2);
+}
+
+/* ========================================
+   NOTIFICATION BANNER - Light Theme Style
+   ======================================== */
+
+.notification-banner {
+  position: relative;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: slideDown 0.4s ease;
+}
+
+[data-theme="light"] .notification-banner {
+  background: linear-gradient(135deg, var(--light-blue-50), var(--light-pink-50));
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  color: var(--text-dark-2);
+}
+
+[data-theme="light"] .notification-banner::before {
+  content: '💡';
+  font-size: 18px;
+}
+
+.notification-banner .close-btn {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.notification-banner .close-btn:hover {
+  opacity: 1;
+}
+
+[data-theme="light"] .notification-banner .close-btn {
+  color: var(--text-gray);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   SPECIAL COLORS FOR ACCENTS
+   ======================================== */
+
+.pink-accent {
+  --accent-color: var(--light-pink-400);
+}
+
+.blue-accent {
+  --accent-color: var(--light-blue-400);
+}
+
+.green-accent {
+  --accent-color: var(--light-green-400);
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */

@@ -1,0 +1,244 @@
+<!-- Shared Header for ELECTRON VISION -->
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">
+        <img src="/logo.png" alt="ELECTRON VISION" class="navbar-logo">
+        <span class="navbar-brand-text">ELECTRON VISION</span>
+      </a>
+      
+      <button class="hamburger" id="hamburger" aria-label="القائمة" aria-expanded="false" aria-controls="navbarNav navbarActions">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="navbar-nav" id="navbarNav">
+        <li><a href="/" class="nav-link" data-page="home">الرئيسية</a></li>
+        <li><a href="/about" class="nav-link" data-page="about">من نحن</a></li>
+        <li><a href="/services" class="nav-link" data-page="services">الخدمات</a></li>
+        <li><a href="/products" class="nav-link" data-page="products">المنتجات</a></li>
+        <li><a href="/sessions" class="nav-link" data-page="booking">الحجوزات</a></li>
+        <li><a href="/support" class="nav-link" data-page="support">الدعم الفني</a></li>
+        <li><a href="/contact" class="nav-link" data-page="contact">تواصل معنا</a></li>
+      </ul>
+
+      <div class="navbar-actions" id="navbarActions">
+        <button class="theme-toggle" onclick="toggleTheme()" title="تبديل السمة"><span>🌙</span></button>
+        <select class="lang-switch" onchange="setLanguage(this.value)">
+          <option value="ar" selected>العربية</option>
+          <option value="en">English</option>
+        </select>
+        
+        <!-- Guest: Show login/register -->
+        <a href="/login" class="btn btn-secondary login-btn" id="loginBtn">تسجيل دخول</a>
+        <a href="/register" class="btn btn-primary register-btn" id="registerBtn">تسجيل</a>
+        
+        <!-- Authenticated: User menu -->
+        <div class="user-menu" id="userMenu" style="display: none;">
+          <button class="user-menu-toggle" onclick="toggleUserMenu()">
+            <span class="user-initial" id="userInitial">U</span>
+            <span class="user-name" id="userName"></span>
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="user-dropdown" id="userDropdown">
+            <a href="/dashboard" class="dropdown-item">
+              <i class="fas fa-user"></i> لوحة التحكم
+            </a>
+            <a href="/profile" class="dropdown-item">
+              <i class="fas fa-cog"></i> الإعدادات
+            </a>
+            <hr class="dropdown-divider">
+            <a href="#" class="dropdown-item logout-link">
+              <i class="fas fa-sign-out-alt"></i> تسجيل خروج
+            </a>
+          </div>
+        </div>
+        
+        <!-- Logout button (visible when authenticated) -->
+        <button class="btn btn-danger logout-btn" id="logoutBtn" style="display: none;" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> خروج
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script src="/js/auth.js"></script>
+<script src="/js/app.js"></script>
+<script>
+function toggleUserMenu() {
+  const dropdown = document.getElementById('userDropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('show');
+  }
+}
+
+document.addEventListener('click', function(e) {
+  const userMenu = document.querySelector('.user-menu');
+  const userDropdown = document.getElementById('userDropdown');
+  if (userMenu && !userMenu.contains(e.target)) {
+    userDropdown && userDropdown.classList.remove('show');
+  }
+  if (e.target.classList.contains('logout-link') || e.target.closest('.logout-link')) {
+    e.preventDefault();
+    logout();
+  }
+});
+
+document.addEventListener('auth:change', function(e) {
+  const state = e.detail;
+  const userMenu = document.getElementById('userMenu');
+  const userName = document.getElementById('userName');
+  const userInitial = document.getElementById('userInitial');
+  
+  if (state.isAuthenticated && state.user) {
+    if (userName) userName.textContent = state.user.username || state.user.email || '';
+    if (userInitial) userInitial.textContent = (state.user.username || state.user.email || 'U')[0].toUpperCase();
+  }
+});
+
+// ===== HAMBURGER MENU =====
+(function() {
+  var hamburger = document.getElementById('hamburger');
+  var nav = document.getElementById('navbarNav');
+  var actions = document.getElementById('navbarActions');
+  if (!hamburger || !nav) return;
+  var backdrop = document.createElement('div');
+  backdrop.className = 'menu-backdrop';
+  document.body.appendChild(backdrop);
+  var menuOpen = false;
+  function openMenu() {
+    menuOpen = true;
+    hamburger.classList.add('active');
+    hamburger.setAttribute('aria-expanded', 'true');
+    nav.classList.add('menu-open');
+    if (actions) actions.classList.add('menu-open');
+    backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu() {
+    menuOpen = false;
+    hamburger.classList.remove('active');
+    hamburger.setAttribute('aria-expanded', 'false');
+    nav.classList.remove('menu-open');
+    if (actions) actions.classList.remove('menu-open');
+    backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  hamburger.addEventListener('click', function(e) { e.stopPropagation(); if (menuOpen) closeMenu(); else openMenu(); });
+  backdrop.addEventListener('click', closeMenu);
+  nav.querySelectorAll('.nav-link, a').forEach(function(link) { link.addEventListener('click', closeMenu); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && menuOpen) { closeMenu(); hamburger.focus(); } });
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+  const currentPath = window.location.pathname;
+  const navLinks = document.querySelectorAll('.nav-link');
+  
+  navLinks.forEach(link => {
+    const href = link.getAttribute('href');
+    if (currentPath === href || (currentPath === '/' && href === '/') || 
+        (currentPath.startsWith(href) && href !== '/')) {
+      link.classList.add('active');
+    }
+  });
+});
+</script>
+
+<style>
+.user-menu {
+  position: relative;
+  display: none;
+}
+
+.user-menu.show .user-dropdown {
+  display: block;
+}
+
+.user-menu-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.user-initial, .user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-initial:hover, .user-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
+
+.user-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+.user-dropdown.show {
+  display: block;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: var(--color-bg-secondary);
+}
+
+.dropdown-item:first-child {
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.dropdown-item:last-child {
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.dropdown-divider {
+  margin: 4px 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+</style>

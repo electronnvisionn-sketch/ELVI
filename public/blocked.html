@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'">
+  <title>تم حظرك | Blocked</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+    }
+    .container {
+      text-align: center;
+      padding: 40px;
+      max-width: 600px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+    .icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 15px;
+      color: #e94560;
+    }
+    .english {
+      font-size: 28px;
+      color: #ff6b6b;
+      margin-bottom: 25px;
+    }
+    .message {
+      font-size: 18px;
+      line-height: 1.8;
+      margin-bottom: 30px;
+      color: #a0a0a0;
+    }
+    .countdown {
+      font-size: 72px;
+      font-weight: bold;
+      color: #e94560;
+      margin: 30px 0;
+      text-shadow: 0 0 20px rgba(233,69,96,0.5);
+    }
+    .reason {
+      background: rgba(233,69,96,0.1);
+      border: 1px solid rgba(233,69,96,0.3);
+      padding: 15px 25px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+    .reason span {
+      color: #e94560;
+      font-weight: bold;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #666;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, #e94560, #ff6b6b);
+      width: 0%;
+      transition: width 1s linear;
+    }
+    .lang-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .lang-toggle:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <button class="lang-toggle" onclick="toggleLanguage()">English</button>
+  
+  <div class="container" id="container-ar">
+    <div class="icon">🚫</div>
+    <h1>تم حظرك</h1>
+    <p class="message">
+      تم اكتشاف نشاط مشبوه من عنوانك IP.<br>
+      تم حظرك تلقائياً لحماية الموقع.<br><br>
+      إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع الدعم الفني.
+    </p>
+    <div class="reason">
+      سبب الحظر: <span id="reason-ar">نشاط مشبوه</span>
+    </div>
+    <div class="countdown" id="countdown-ar">10</div>
+    <p>جاري إعادة توجيهك...</p>
+    <div class="progress-bar">
+      <div class="progress" id="progress-ar"></div>
+    </div>
+  </div>
+
+  <div class="container hidden" id="container-en">
+    <div class="icon">🚫</div>
+    <h1>You Have Been Blocked</h1>
+    <p class="message">
+      Suspicious activity was detected from your IP address.<br>
+      You have been automatically blocked to protect the site.<br><br>
+      If you believe this is an error, please contact support.
+    </p>
+    <div class="reason">
+      Block Reason: <span id="reason-en">Suspicious activity</span>
+    </div>
+    <div class="countdown" id="countdown-en">10</div>
+    <p>Redirecting...</p>
+    <div class="progress-bar">
+      <div class="progress" id="progress-en"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2024 ELECTRON VISION - Security System
+  </div>
+
+  <script>
+    let seconds = 10;
+    let currentLang = 'ar';
+    let isBlocked = false;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const reason = urlParams.get('reason') || 'suspicious_activity';
+    document.getElementById('reason-ar').textContent = reason;
+    document.getElementById('reason-en').textContent = reason;
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      document.getElementById('container-ar').classList.toggle('hidden', currentLang !== 'ar');
+      document.getElementById('container-en').classList.toggle('hidden', currentLang !== 'en');
+      document.querySelector('.lang-toggle').textContent = currentLang === 'ar' ? 'English' : 'العربية';
+    }
+
+    function setPermanentBlock() {
+      localStorage.setItem('blocked_' + window.location.hostname, 'true');
+      localStorage.setItem('block_reason', reason);
+      localStorage.setItem('blocked_at', Date.now());
+      
+      document.cookie = 'blocked=true; path=/; max-age=' + (365 * 24 * 60 * 60);
+      document.cookie = 'block_reason=' + encodeURIComponent(reason) + '; path=/; max-age=' + (365 * 24 * 60 * 60);
+      document.cookie = 'blocked_at=' + Date.now() + '; path=/; max-age=' + (365 * 24 * 60 * 60);
+    }
+
+    function checkExistingBlock() {
+      const stored = localStorage.getItem('blocked_' + window.location.hostname);
+      if (stored === 'true') {
+        isBlocked = true;
+        return true;
+      }
+      return false;
+    }
+
+    if (checkExistingBlock()) {
+      document.body.innerHTML = '<div class="container"><h1>🚫 تم حظرك نهائياً</h1><p>You are permanently blocked</p></div>';
+    }
+
+    function updateCountdown() {
+      const arEl = document.getElementById('countdown-ar');
+      const enEl = document.getElementById('countdown-en');
+      const progressAr = document.getElementById('progress-ar');
+      const progressEn = document.getElementById('progress-en');
+      
+      if (arEl) arEl.textContent = seconds;
+      if (enEl) enEl.textContent = seconds;
+      
+      const progress = ((10 - seconds) / 10) * 100;
+      if (progressAr) progressAr.style.width = progress + '%';
+      if (progressEn) progressEn.style.width = progress + '%';
+      
+      if (seconds <= 0) {
+        setPermanentBlock();
+        
+        const blockData = {
+          blocked: true,
+          reason: reason,
+          timestamp: Date.now()
+        };
+        
+        try {
+          sessionStorage.setItem('security_block', JSON.stringify(blockData));
+        } catch(e) {}
+        
+        window.location.href = '/';
+      } else {
+        seconds--;
+        setTimeout(updateCountdown, 1000);
+      }
+    }
+
+    updateCountdown();
+
+    window.addEventListener('beforeunload', function() {
+      if (seconds <= 0 && !isBlocked) {
+        try {
+          localStorage.setItem('blocked_' + window.location.hostname, 'true');
+        } catch(e) {}
+      }
+    });
+
+    if (window.history && window.history.pushState) {
+      window.history.pushState(null, null, window.location.href);
+      window.addEventListener('popstate', function() {
+        if (isBlocked || seconds <= 0) {
+          window.history.pushState(null, null, window.location.href);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

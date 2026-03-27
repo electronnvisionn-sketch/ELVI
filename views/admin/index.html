@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة الإدارة - ELECTRON VISION</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin-panel.css">
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --secondary-color: #8b5cf6;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+      --warning-color: #f59e0b;
+      --bg-color: #f8fafc;
+      --sidebar-bg: #1e293b;
+      --sidebar-text: #e2e8f0;
+      --card-bg: #ffffff;
+      --text-color: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+    }
+    [data-theme="dark"] {
+      --bg-color: #0f172a;
+      --bg-secondary: #1e293b;
+      --sidebar-bg: #020617;
+      --card-bg: #1e293b;
+      --text-color: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --primary: #6366f1;
+    }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+    .modal { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+    .modal-header h3 { margin: 0; color: var(--text-color); }
+    .modal-header button { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
+    .modal-header button:hover { color: var(--text-color); }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-color); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-color); font-family: inherit; transition: border-color 0.2s, box-shadow 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: var(--text-muted); }
+    .form-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-color); font-family: inherit; }
+    .form-select { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-color); font-family: inherit; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .theme-toggle { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 18px; transition: all 0.3s; }
+    .theme-toggle:hover { background: var(--primary-color); color: white; }
+    .notification-bell { position: relative; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 18px; }
+    .notification-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+    .notification-dropdown { position: absolute; top: 100%; right: 0; width: 320px; max-height: 400px; overflow-y: auto; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); z-index: 1000; display: none; }
+    .notification-dropdown.show { display: block; }
+    .notification-item { padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; }
+    .notification-item:hover { background: var(--bg-color); }
+    .notification-item.unread { background: rgba(99,102,241,0.1); }
+    .quick-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .quick-action-btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; border: none; transition: all 0.2s; }
+    .quick-action-btn.primary { background: var(--primary-color); color: white; }
+    .quick-action-btn.success { background: var(--success-color); color: white; }
+    .quick-action-btn.warning { background: var(--warning-color); color: white; }
+    .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 24px; }
+    .analytics-card { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); }
+    .analytics-card h4 { margin: 0 0 12px 0; color: var(--text-muted); font-size: 14px; }
+    .analytics-value { font-size: 28px; font-weight: 700; color: var(--text-color); }
+    .analytics-change { font-size: 13px; margin-top: 8px; }
+    .analytics-change.positive { color: var(--success-color); }
+    .analytics-change.negative { color: var(--danger-color); }
+    .system-health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .health-item { background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .health-label { font-size: 13px; color: var(--text-muted); }
+    .health-value { font-size: 20px; font-weight: 600; margin-top: 4px; }
+    .status-indicator { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+    .status-indicator.online { background: var(--success-color); }
+    .status-indicator.offline { background: var(--danger-color); }
+    .status-indicator.warning { background: var(--warning-color); }
+    .user-profile-section { position: relative; }
+    .user-profile-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 14px; }
+    .quick-action-btn.success { background: var(--success-color); color: white; }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; text-transform: uppercase; color: white; }
+    .user-dropdown { position: absolute; top: 100%; right: 0; min-width: 180px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; display: none; }
+    .user-dropdown.show { display: block; }
+    .user-dropdown .dropdown-item { display: flex; align-items: center; gap: 8px; padding: 10px 14px; color: var(--text-color); text-decoration: none; font-size: 14px; }
+    .user-dropdown .dropdown-item:hover { background: var(--bg-color); }
+    .user-dropdown .dropdown-divider { margin: 4px 0; border: none; border-top: 1px solid var(--border-color); }
+    .cyber-tab {
+      padding: 7px 14px;
+      border: 1px solid var(--color-border, #444);
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .cyber-tab:hover { background: rgba(99,102,241,0.1); color: var(--text-primary); }
+    .cyber-tab.active { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-color: transparent; }
+    @keyframes cyber-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .cyber-stat { background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.03)); border: 1px solid rgba(99,102,241,0.2); border-radius: 10px; padding: 14px; text-align: center; }
+    .cyber-stat .val { font-size: 26px; font-weight: 700; }
+    .cyber-stat .lbl { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+    .cyber-bar { display: flex; height: 24px; border-radius: 6px; overflow: hidden; margin: 4px 0; }
+    .cyber-bar div { display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; font-weight: 600; min-width: 20px; }
+    .cyber-alert { padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .cyber-alert.high { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
+    .cyber-alert.medium { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: #f59e0b; }
+    .cyber-alert.low { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #3b82f6; }
+  </style>
+</head>
+<body>
+  <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  <div class="admin-sidebar-overlay" onclick="toggleSidebar()"></div>
+  <button class="sidebar-scroll sidebar-scroll-up" onclick="scrollSidebar('up')" title="أعلى">▲</button>
+  <button class="sidebar-scroll sidebar-scroll-down" onclick="scrollSidebar('down')" title="أسفل">▼</button>
+  
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-brand">
+        <img src="/logo.png" alt="ELECTRON VISION">
+        <span class="verified-badge">✓ موثق</span>
+      </div>
+      <ul class="admin-nav">
+        <li class="admin-nav-item" data-roles="admin,manager,moderator"><a href="#" class="admin-nav-link active" data-tab="dashboard"><span class="menu-icon">📊</span> لوحة التحكم</a></li>
+
+        <li class="admin-menu-section" data-roles="admin,manager">
+          <button class="admin-menu-header" data-menu="users"><span><span class="menu-icon">👥</span> المستخدمين</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-users"><a href="#" class="admin-submenu-item" data-tab="users">قائمة المستخدمين</a></div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin">
+          <button class="admin-menu-header" data-menu="products"><span><span class="menu-icon">📦</span> المنتجات</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-products"><a href="#" class="admin-submenu-item" data-tab="products">إدارة المنتجات</a></div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin">
+          <button class="admin-menu-header" data-menu="services"><span><span class="menu-icon">⚙️</span> الخدمات</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-services"><a href="#" class="admin-submenu-item" data-tab="services">إدارة الخدمات</a></div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin,moderator">
+          <button class="admin-menu-header" data-menu="tickets"><span><span class="menu-icon">🎫</span> التذاكر</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-tickets"><a href="#" class="admin-submenu-item" data-tab="tickets">إدارة التذاكر</a></div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin,moderator">
+          <button class="admin-menu-header" data-menu="sessions"><span><span class="menu-icon">📅</span> الجلسات</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-sessions"><a href="#" class="admin-submenu-item" data-tab="sessions">إدارة الجلسات</a></div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin,moderator">
+          <button class="admin-menu-header" data-menu="messages"><span><span class="menu-icon">📧</span> الرسائل</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-messages"><a href="#" class="admin-submenu-item" data-tab="messages">رسائل التواصل</a></div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin">
+          <button class="admin-menu-header" data-menu="coupons"><span><span class="menu-icon">🏷️</span> أكواد الخصم</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-coupons"><a href="#" class="admin-submenu-item" data-tab="coupons">إدارة الأكواد</a></div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin">
+          <button class="admin-menu-header" data-menu="database"><span><span class="menu-icon">🗄️</span> قاعدة البيانات</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-database">
+            <a href="#" class="admin-submenu-item" data-tab="database">إدارة قاعدة البيانات</a>
+            <a href="#" class="admin-submenu-item" data-tab="db-users">جدول المستخدمين</a>
+            <a href="#" class="admin-submenu-item" data-tab="db-products">جدول المنتجات</a>
+            <a href="#" class="admin-submenu-item" data-tab="db-orders">جدول الطلبات</a>
+            <a href="#" class="admin-submenu-item" data-tab="db-bookings">جدول الجلسات</a>
+          </div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin">
+          <button class="admin-menu-header" data-menu="analytics"><span><span class="menu-icon">📈</span> التحليلات</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-analytics">
+            <a href="#" class="admin-submenu-item" data-tab="analytics">لوحة التحليلات</a>
+            <a href="#" class="admin-submenu-item" data-tab="api-usage">استخدام API</a>
+          </div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin">
+          <button class="admin-menu-header" data-menu="system"><span><span class="menu-icon">🖥️</span> النظام</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-system">
+            <a href="#" class="admin-submenu-item" data-tab="system-health">صحة النظام</a>
+            <a href="#" class="admin-submenu-item" data-tab="error-logs">سجل الأخطاء</a>
+          </div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin,manager">
+          <button class="admin-menu-header" data-menu="automation"><span><span class="menu-icon">📢</span> البث والإشعارات</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-automation">
+            <a href="#" class="admin-submenu-item" data-tab="broadcasts">إرسال بث</a>
+            <a href="#" class="admin-submenu-item" data-tab="notifications">الإشعارات</a>
+          </div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin">
+          <button class="admin-menu-header" data-menu="autoresponses"><span><span class="menu-icon">🤖</span> الردود التلقائية</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-autoresponses">
+            <a href="#" class="admin-submenu-item" data-tab="auto-responses">إدارة الردود</a>
+          </div>
+        </li>
+
+        <li class="admin-menu-section" data-roles="admin">
+          <button class="admin-menu-header" data-menu="firewall"><span><span class="menu-icon">🛡️</span> الجدار الناري</span><span class="menu-arrow">▼</span></button>
+          <div class="admin-submenu" id="submenu-firewall">
+            <a href="#" class="admin-submenu-item" data-tab="firewall">حالة الحماية</a>
+          </div>
+        </li>
+
+        <li class="admin-nav-divider"></li>
+        <li class="admin-nav-item"><a href="/dashboard" class="admin-nav-link"><span class="menu-icon">↩️</span> العودة للموقع</a></li>
+        <li class="admin-nav-item"><button onclick="logout()" class="admin-nav-action"><span class="menu-icon">🚪</span> تسجيل الخروج</button></li>
+      </ul>
+    </aside>
+
+    <main class="admin-content">
+      <div class="admin-main">
+        <div class="admin-header">
+          <div><h1>لوحة الإدارة</h1><div class="text-muted" id="admin-info"></div></div>
+          <div class="header-actions">
+            <a href="/dashboard" class="quick-action-btn success" title="العودة للوحة التحكم"><i class="fas fa-home"></i></a>
+            <div class="user-profile-section" id="user-profile" style="display: none;">
+              <button class="user-profile-btn" onclick="toggleUserMenu()">
+                <span class="user-avatar" id="admin-avatar">A</span>
+                <span class="user-name" id="admin-name"></span>
+                <span class="dropdown-arrow">▼</span>
+              </button>
+              <div class="user-dropdown" id="user-dropdown">
+                <a href="/dashboard" class="dropdown-item"><i class="fas fa-user"></i> لوحة التحكم</a>
+                <a href="/profile" class="dropdown-item"><i class="fas fa-cog"></i> الإعدادات</a>
+                <hr class="dropdown-divider">
+                <a href="#" class="dropdown-item logout-link"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a>
+              </div>
+            </div>
+            <div class="quick-actions"><button class="quick-action-btn primary" onclick="showQuickAction('broadcast')">📢 بث رسالة</button></div>            </div>
+          </div>
+        </div>
+
+        <div class="tab-content active" id="tab-dashboard">
+          <div class="admin-stats-grid">
+            <div class="dashboard-card"><div class="dashboard-card-icon">👥</div><div class="dashboard-card-value" id="stat-users">0</div><div class="dashboard-card-label">إجمالي المستخدمين</div></div>
+            <div class="dashboard-card"><div class="dashboard-card-icon">📦</div><div class="dashboard-card-value" id="stat-products">0</div><div class="dashboard-card-label">إجمالي المنتجات</div></div>
+            <div class="dashboard-card"><div class="dashboard-card-icon">🎫</div><div class="dashboard-card-value" id="stat-tickets">0</div><div class="dashboard-card-label">إجمالي التذاكر</div></div>
+            <div class="dashboard-card"><div class="dashboard-card-icon">📧</div><div class="dashboard-card-value" id="stat-messages">0</div><div class="dashboard-card-label">الرسائل الجديدة</div></div>
+          </div>
+          <div class="card"><h3>النشاط الأخير</h3><div id="recent-activity"></div></div>
+        </div>
+ 
+        <div class="tab-content" id="tab-analytics">
+          <div style="margin-bottom: 24px;">
+            <h3 style="color: var(--text-primary); margin-bottom: 20px;"><span style="margin-right: 8px;">📊</span>نظرة عامة على التحليلات</h3>
+          </div>
+          <div class="analytics-grid">
+            <div class="analytics-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(99, 102, 241, 0.3);">
+              <h4 style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">إجمالي الإيرادات</h4>
+              <div class="analytics-value" id="analytics-revenue" style="font-size: 32px; font-weight: 700; color: #6366f1;">$0</div>
+              <div class="analytics-change positive" id="analytics-revenue-change">+0%</div>
+            </div>
+            <div class="analytics-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.1)); border: 1px solid rgba(16, 185, 129, 0.3);">
+              <h4 style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">إجمالي الطلبات</h4>
+              <div class="analytics-value" id="analytics-orders" style="font-size: 32px; font-weight: 700; color: #10b981;">0</div>
+              <div class="analytics-change positive" id="analytics-orders-change">+0%</div>
+            </div>
+            <div class="analytics-card" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.1)); border: 1px solid rgba(245, 158, 11, 0.3);">
+              <h4 style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">متوسط الطلب</h4>
+              <div class="analytics-value" id="analytics-avg-order" style="font-size: 32px; font-weight: 700; color: #f59e0b;">$0</div>
+            </div>
+            <div class="analytics-card" style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(244, 114, 182, 0.1)); border: 1px solid rgba(236, 72, 153, 0.3);">
+              <h4 style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">المستخدمين الجدد</h4>
+              <div class="analytics-value" id="analytics-new-users" style="font-size: 32px; font-weight: 700; color: #ec4899;">0</div>
+              <div class="analytics-change positive" id="analytics-users-change">+0%</div>
+            </div>
+          </div>
+          <div class="card" style="margin-top: 24px;">
+            <h3 style="color: var(--text-primary); margin-bottom: 16px;"><span style="margin-right: 8px;">🏆</span>أفضل المنتجات مبيعاً</h3>
+            <div id="top-products" style="padding: 20px; text-align: center; color: var(--text-muted);">جاري التحميل...</div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-api-usage">
+          <div style="margin-bottom: 24px;">
+            <h3 style="color: var(--text-primary);"><span style="margin-right: 8px;">🔌</span>إحصائيات استخدام API</h3>
+            <p style="color: var(--text-muted); margin-top: 8px;">مراقبة استخدام واجهة برمجة التطبيقات</p>
+          </div>
+          <div class="card">
+            <div id="api-stats" style="padding: 20px; text-align: center; color: var(--text-muted);">جاري التحميل...</div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-system-health">
+          <div style="margin-bottom: 24px;">
+            <h3 style="color: var(--text-primary);"><span style="margin-right: 8px;">🖥️</span>صحة النظام والخادم</h3>
+            <p style="color: var(--text-muted); margin-top: 8px;">مراقبة حالة الخادم والاتصالات في الوقت الفعلي</p>
+          </div>
+          <div class="system-health-grid">
+            <div class="health-item" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05)); border: 1px solid rgba(16, 185, 129, 0.3);">
+              <div class="health-label" style="color: var(--text-secondary); font-size: 13px;">حالة الخادم</div>
+              <div class="health-value" style="color: #10b981; font-size: 18px; font-weight: 600;"><span class="status-indicator online" style="background: #10b981;"></span><span id="server-status">Online</span></div>
+            </div>
+            <div class="health-item" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0.05)); border: 1px solid rgba(99, 102, 241, 0.3);">
+              <div class="health-label" style="color: var(--text-secondary); font-size: 13px;">وقت التشغيل</div>
+              <div class="health-value" style="color: #6366f1; font-size: 18px; font-weight: 600;" id="server-uptime">0 ساعة</div>
+            </div>
+            <div class="health-item" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05)); border: 1px solid rgba(245, 158, 11, 0.3);">
+              <div class="health-label" style="color: var(--text-secondary); font-size: 13px;">الذاكرة المستخدمة</div>
+              <div class="health-value" style="color: #f59e0b; font-size: 18px; font-weight: 600;" id="server-memory">0 MB</div>
+            </div>
+            <div class="health-item" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.05)); border: 1px solid rgba(139, 92, 246, 0.3);">
+              <div class="health-label" style="color: var(--text-secondary); font-size: 13px;">حجم قاعدة البيانات</div>
+              <div class="health-value" style="color: #8b5cf6; font-size: 18px; font-weight: 600;" id="db-size">0 MB</div>
+            </div>
+            <div class="health-item" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05)); border: 1px solid rgba(6, 182, 212, 0.3);">
+              <div class="health-label" style="color: var(--text-secondary); font-size: 13px;">حالة التلجرام</div>
+              <div class="health-value" style="color: #06b6d4; font-size: 18px; font-weight: 600;"><span class="status-indicator online" id="telegram-status" style="background: #10b981;"></span><span>متصل</span></div>
+            </div>
+            <div class="health-item" style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(236, 72, 153, 0.05)); border: 1px solid rgba(236, 72, 153, 0.3);">
+              <div class="health-label" style="color: var(--text-secondary); font-size: 13px;">إصدار Node.js</div>
+              <div class="health-value" style="color: #ec4899; font-size: 18px; font-weight: 600;" id="node-version">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-error-logs">
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>الخطأ</th><th>الوقت</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="error-logs-table"><tr><td colspan="4" style="text-align: center; padding: 20px;">جاري التحميل...</td></tr></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-broadcasts">
+          <div class="card" style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 style="margin: 0; color: var(--text-primary);"><span style="margin-right: 8px;">📢</span>البث الرسائل</h3>
+              <button class="btn btn-primary" onclick="showBroadcastModal()" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; padding: 10px 20px; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">+ إنشاء بث جديد</button>
+            </div>
+            <p style="color: var(--text-muted); margin: 0;">إرسال رسائل لجميع المستخدمين أو مجموعات محددة</p>
+          </div>
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>العنوان</th><th>الهدف</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody id="broadcasts-table"><tr><td colspan="5" style="text-align: center; padding: 20px;">جاري التحميل...</td></tr></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-auto-responses">
+          <div class="card" style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 style="margin: 0; color: var(--text-primary);"><span style="margin-right: 8px;">🤖</span>الردود التلقائية</h3>
+              <button class="btn btn-primary" onclick="showAutoResponseModal()" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; padding: 10px 20px; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">+ إضافة رد تلقائي</button>
+            </div>
+            <p style="color: var(--text-muted); margin: 0;">إنشاء ردود تلقائية للرسائل الواردة بناءً على الكلمات المفتاحية</p>
+          </div>
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>الكلمة المفتاحية</th><th>الرد</th><th>الحالة</th><th>الأولوية</th><th>إجراءات</th></tr></thead><tbody id="auto-responses-table"><tr><td colspan="5" style="text-align: center; padding: 20px;">جاري التحميل...</td></tr></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-firewall">
+          <!-- Top bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span id="cyber-live-dot" style="width:10px;height:10px;border-radius:50%;background:#10b981;animation:cyber-pulse 2s infinite;"></span>
+              <span style="font-size:14px;color:var(--text-primary);font-weight:600;">غرفة المراقبة السيبرانية</span>
+              <span id="cyber-last-update" style="font-size:11px;color:var(--text-muted);"></span>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="loadCyberDashboard()" style="padding:6px 14px;border-radius:6px;border:1px solid var(--color-border,#444);background:transparent;color:var(--text-primary);cursor:pointer;font-size:12px;"> تحديث</button>
+              <select id="cyber-auto-refresh" onchange="toggleCyberAutoRefresh()" style="padding:6px 10px;border-radius:6px;border:1px solid var(--color-border,#444);background:var(--color-bg,#1a1a2e);color:var(--text-primary);font-size:12px;">
+                <option value="0">بدون تحديث</option>
+                <option value="10" selected>كل 10 ثواني</option>
+                <option value="30">كل 30 ثانية</option>
+                <option value="60">كل دقيقة</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Sub-tabs -->
+          <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;overflow-x:auto;padding-bottom:8px;" id="cyber-tabs-bar">
+            <button onclick="showCyberTab('overview')" class="cyber-tab active" data-ctab="overview"> نظرة عامة</button>
+            <button onclick="showCyberTab('rules')" class="cyber-tab" data-ctab="rules"> القواعد</button>
+            <button onclick="showCyberTab('connections')" class="cyber-tab" data-ctab="connections"> الاتصالات</button>
+            <button onclick="showCyberTab('threats')" class="cyber-tab" data-ctab="threats"> التهديدات</button>
+            <button onclick="showCyberTab('waf')" class="cyber-tab" data-ctab="waf"> WAF</button>
+            <button onclick="showCyberTab('blocked')" class="cyber-tab" data-ctab="blocked"> المحظورين</button>
+            <button onclick="showCyberTab('logins')" class="cyber-tab" data-ctab="logins"> الدخول</button>
+            <button onclick="showCyberTab('events')" class="cyber-tab" data-ctab="events"> الأحداث</button>
+          </div>
+
+          <!-- OVERVIEW -->
+          <div id="ctab-overview" class="ctab-panel">
+            <div id="cyber-stats-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px;"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+              <div class="card" style="padding:16px;"><h4 style="margin:0 0 10px 0;font-size:14px;"> حزم مدخلة/مرفوضة</h4><div id="cyber-pkt-chart"></div></div>
+              <div class="card" style="padding:16px;"><h4 style="margin:0 0 10px 0;font-size:14px;"> الهجمات بالساعة</h4><div id="cyber-hourly-chart"></div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+              <div class="card" style="padding:14px;"><h4 style="margin:0 0 8px 0;font-size:13px;"> حالة الاتصالات</h4><div id="cyber-conn-states"></div></div>
+              <div class="card" style="padding:14px;"><h4 style="margin:0 0 8px 0;font-size:13px;"> أداء الجدار الناري</h4><div id="cyber-perf"></div></div>
+              <div class="card" style="padding:14px;"><h4 style="margin:0 0 8px 0;font-size:13px;"> مصادر الهجمات</h4><div id="cyber-threat-src"></div></div>
+            </div>
+            <div id="cyber-alerts-bar" style="margin-bottom:16px;"></div>
+            <div class="card" style="padding:16px;"><h4 style="margin:0 0 10px 0;font-size:14px;"> أكثر IPs هجوماً (24 ساعة)</h4><div id="cyber-top-ips"></div></div>
+          </div>
+
+          <!-- RULES -->
+          <div id="ctab-rules" class="ctab-panel" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="card" style="padding:16px;">
+                <h4 style="margin:0 0 10px 0;"> قواعد iptables</h4>
+                <div style="overflow-x:auto;max-height:500px;overflow-y:auto;"><table class="data-table"><thead><tr><th>#</th><th>سلسلة</th><th>الهدف</th><th>البروتوكول</th><th>المصدر</th><th>الوجهة</th><th>الحزم</th></tr></thead><tbody id="iptables-table"></tbody></table></div>
+              </div>
+              <div class="card" style="padding:16px;">
+                <h4 style="margin:0 0 10px 0;"> قواعد UFW</h4>
+                <div id="ufw-status" style="margin-bottom:10px;"></div>
+                <div style="overflow-x:auto;max-height:500px;overflow-y:auto;"><table class="data-table"><thead><tr><th>#</th><th>المنفذ</th><th>الإجراء</th><th>الاتجاه</th><th>من</th></tr></thead><tbody id="ufw-table"></tbody></table></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONNECTIONS -->
+          <div id="ctab-connections" class="ctab-panel" style="display:none;">
+            <div class="card" style="padding:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h4 style="margin:0;"> الاتصالات النشطة</h4>
+                <div style="display:flex;gap:8px;">
+                  <input type="text" id="conn-filter" placeholder="فلترة حسب IP أو منفذ" style="padding:6px 10px;border-radius:6px;border:1px solid var(--color-border,#444);background:var(--color-bg,#1a1a2e);color:var(--text-primary);font-size:12px;width:200px;">
+                  <button onclick="filterConnections()" style="padding:6px 12px;border-radius:6px;border:1px solid var(--color-border,#444);background:transparent;color:var(--text-primary);cursor:pointer;font-size:12px;">بحث</button>
+                </div>
+              </div>
+              <div style="overflow-x:auto;max-height:500px;overflow-y:auto;"><table class="data-table"><thead><tr><th>البروتوكول</th><th>الحالة</th><th>المحلي</th><th>البعيد</th><th>العملية</th></tr></thead><tbody id="connections-table"></tbody></table></div>
+            </div>
+          </div>
+
+          <!-- THREATS -->
+          <div id="ctab-threats" class="ctab-panel" style="display:none;">
+            <div id="threat-levels" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+              <div class="card" style="padding:14px;border-left:4px solid #ef4444;"><h4 style="margin:0 0 8px 0;color:#ef4444;">عالية الخطورة</h4><div id="threat-high"></div></div>
+              <div class="card" style="padding:14px;border-left:4px solid #f59e0b;"><h4 style="margin:0 0 8px 0;color:#f59e0b;">متوسطة</h4><div id="threat-medium"></div></div>
+              <div class="card" style="padding:14px;border-left:4px solid #3b82f6;"><h4 style="margin:0 0 8px 0;color:#3b82f6;">منخفضة</h4><div id="threat-low"></div></div>
+            </div>
+            <div class="card" style="padding:16px;"><h4 style="margin:0 0 10px 0;"> شبكات مشبوهة</h4><div id="suspicious-networks"></div></div>
+          </div>
+
+          <!-- WAF -->
+          <div id="ctab-waf" class="ctab-panel" style="display:none;">
+            <div class="card" style="padding:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+                <h4 style="margin:0;">سجلات جدار الحماية الويب</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <select id="waf-type-filter" style="padding:6px 10px;border-radius:6px;border:1px solid var(--color-border,#444);background:var(--color-bg,#1a1a2e);color:var(--text-primary);font-size:12px;"><option value="">كل الأنواع</option></select>
+                  <input type="text" id="waf-ip-filter" placeholder="فلترة IP" style="padding:6px 10px;border-radius:6px;border:1px solid var(--color-border,#444);background:var(--color-bg,#1a1a2e);color:var(--text-primary);font-size:12px;width:140px;">
+                  <button onclick="loadWAFLogs(1)" style="padding:6px 12px;border-radius:6px;border:1px solid var(--color-border,#444);background:transparent;color:var(--text-primary);cursor:pointer;font-size:12px;">بحث</button>
+                  <a href="/api/admin/cybersecurity/export?type=waf" style="padding:6px 12px;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;text-decoration:none;font-size:12px;">تصدير CSV</a>
+                </div>
+              </div>
+              <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>الوقت</th><th>العنوان</th><th>النوع</th><th>المسار</th><th>الدرجة</th><th>الحالة</th></tr></thead><tbody id="waf-logs-body"></tbody></table></div>
+              <div id="waf-pagination" style="margin-top:10px;text-align:center;"></div>
+            </div>
+          </div>
+
+          <!-- BLOCKED IPS -->
+          <div id="ctab-blocked" class="ctab-panel" style="display:none;">
+            <div class="card" style="padding:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+                <h4 style="margin:0;">إدارة العناوين المحظورة</h4>
+                <div style="display:flex;gap:8px;">
+                  <button onclick="showBlockModal()" style="padding:6px 14px;border-radius:6px;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;cursor:pointer;font-size:12px;font-weight:600;">+ حظر عنوان</button>
+                  <button onclick="unblockAll()" style="padding:6px 14px;border-radius:6px;border:1px solid var(--color-border,#444);background:transparent;color:var(--text-primary);cursor:pointer;font-size:12px;">إلغاء المؤقت</button>
+                  <a href="/api/admin/cybersecurity/export?type=blocked" style="padding:6px 14px;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;text-decoration:none;font-size:12px;">تصدير CSV</a>
+                </div>
+              </div>
+              <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>العنوان</th><th>السبب</th><th>تاريخ الحظر</th><th>ينتهي</th><th>النوع</th><th>إجراءات</th></tr></thead><tbody id="blocked-body"></tbody></table></div>
+            </div>
+          </div>
+
+          <!-- LOGIN HISTORY -->
+          <div id="ctab-logins" class="ctab-panel" style="display:none;">
+            <div class="card" style="padding:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+                <h4 style="margin:0;">سجل تسجيلات الدخول</h4>
+                <div style="display:flex;gap:8px;">
+                  <select id="login-status-filter" onchange="loadLoginHistory(1)" style="padding:6px 10px;border-radius:6px;border:1px solid var(--color-border,#444);background:var(--color-bg,#1a1a2e);color:var(--text-primary);font-size:12px;"><option value="">الكل</option><option value="1">ناجحة</option><option value="0">فاشلة</option></select>
+                  <a href="/api/admin/cybersecurity/export?type=logins" style="padding:6px 14px;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;text-decoration:none;font-size:12px;">تصدير CSV</a>
+                </div>
+              </div>
+              <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>الوقت</th><th>البريد</th><th>العنوان</th><th>المتصفح</th><th>الحالة</th></tr></thead><tbody id="logins-body"></tbody></table></div>
+              <div id="logins-pagination" style="margin-top:10px;text-align:center;"></div>
+            </div>
+          </div>
+
+          <!-- SECURITY EVENTS -->
+          <div id="ctab-events" class="ctab-panel" style="display:none;">
+            <div class="card" style="padding:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+                <h4 style="margin:0;">سجل الأحداث الأمنية</h4>
+                <div style="display:flex;gap:8px;">
+                  <select id="event-type-filter" onchange="loadSecurityEvents(1)" style="padding:6px 10px;border-radius:6px;border:1px solid var(--color-border,#444);background:var(--color-bg,#1a1a2e);color:var(--text-primary);font-size:12px;"><option value="">الكل</option></select>
+                  <a href="/api/admin/cybersecurity/export?type=events" style="padding:6px 14px;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;text-decoration:none;font-size:12px;">تصدير CSV</a>
+                </div>
+              </div>
+              <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>الوقت</th><th>النوع</th><th>التفاصيل</th><th>العنوان</th></tr></thead><tbody id="events-body"></tbody></table></div>
+              <div id="events-pagination" style="margin-top:10px;text-align:center;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-notifications">
+          <div class="card" style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 style="margin: 0; color: var(--text-primary);">الإشعارات</h3>
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="markAllAdminNotificationsRead()" style="background: linear-gradient(135deg, #10b981, #059669); border: none; padding: 10px 20px; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">تعليم الكل كمقروء</button>
+                <button class="btn btn-danger" onclick="deleteAllAdminNotifications()" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; padding: 10px 20px; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">حذف الكل</button>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>العنوان</th><th>الرسالة</th><th>النوع</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody id="notifications-admin-table"><tr><td colspan="6" style="text-align: center; padding: 20px;">جاري التحميل...</td></tr></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-users">
+          <div class="card" style="display: flex; justify-content: space-between; align-items: center;"><h3 style="margin: 0;">إدارة المستخدمين</h3><button class="btn btn-primary" onclick="showUserModal()">+ إضافة مستخدم</button></div>
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>المستخدم</th><th>البريد الإلكتروني</th><th>الدور</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="users-table"></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-products">
+          <div class="card"><button class="btn btn-primary" onclick="showProductModal()">+ إضافة منتج</button></div>
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>الاسم</th><th>السعر</th><th>النوع</th><th>إجراءات</th></tr></thead><tbody id="products-table"></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-services">
+          <div class="card"><button class="btn btn-primary" onclick="showServiceModal()">+ إضافة خدمة</button></div>
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>الاسم</th><th>الوصف</th><th>إجراءات</th></tr></thead><tbody id="services-table"></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-tickets">
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div style="padding: 1rem; border-bottom: 1px solid var(--border-color);"><button class="btn btn-primary" onclick="showCreateTicketModal()">+ إضافة تذكرة جديدة</button></div>
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>المعرف</th><th>العنوان</th><th>المستخدم</th><th>الخطورة</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody id="tickets-table"></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-sessions">
+          <div class="card">
+            <div class="booking-stats-grid">
+              <div class="booking-stat-card"><div class="booking-stat-label">المعلقة</div><div class="booking-stat-value" id="bookings-pending">0</div></div>
+              <div class="booking-stat-card"><div class="booking-stat-label">المقبولة</div><div class="booking-stat-value" id="bookings-accepted">0</div></div>
+              <div class="booking-stat-card"><div class="booking-stat-label">المرفوضة</div><div class="booking-stat-value" id="bookings-rejected">0</div></div>
+              <div class="booking-stat-card"><div class="booking-stat-label">المكتملة</div><div class="booking-stat-value" id="bookings-completed">0</div></div>
+            </div>
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>المستخدم</th><th>نوع الجلسة</th><th>التاريخ</th><th>الوقت</th><th>المدة</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="sessions-table"></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-messages">
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>الاسم</th><th>الهاتف</th><th>البريد الإلكتروني</th><th>الموضوع</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody id="messages-table"></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-coupons">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);"><h3 style="margin: 0;">إدارة أكواد الخصم</h3><button class="btn btn-primary" onclick="openCouponModal()">+ إضافة كود</button></div>
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>الكود</th><th>الوصف</th><th>نوع الخصم</th><th>القيمة</th><th>المرات</th><th>صلاحية</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="coupons-table"></tbody></table></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-database">
+          <div id="db-auth-section">
+            <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+              <div style="font-size: 4rem; margin-bottom: var(--space-4);">🔐</div>
+              <h3 style="margin-bottom: var(--space-4);">تحقق من هوية المسؤول</h3>
+              <p class="text-muted" style="margin-bottom: var(--space-6);">يرجى إدخال كلمة المرور للوصول إلى إدارة قاعدة البيانات</p>
+              <div class="form-group"><input type="password" id="db-admin-password" class="form-input" placeholder="أدخل كلمة المرور" style="text-align: center;"></div>
+              <button class="btn btn-primary" onclick="verifyDbAdmin()" style="width: 100%;">تحقق</button>
+              <p id="db-auth-error" class="text-error" style="margin-top: var(--space-4); display: none;">كلمة المرور غير صحيحة</p>
+            </div>
+          </div>
+          <div id="db-tables-section" style="display: none;">
+            <div class="card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);"><h3 style="margin: 0;">📊 إحصائيات قاعدة البيانات</h3><button class="btn btn-secondary" onclick="lockDatabase()">🔒 قفل</button></div>
+              <div class="table-wrapper"><table class="data-table"><thead><tr><th>الجدول</th><th>عدد السجلات</th><th>آخر تحديث</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>
+                <tr><td><strong>👥 المستخدمين</strong></td><td id="db-users-count">-</td><td id="db-users-date">-</td><td><span class="badge badge-success">نشط</span></td><td><button class="btn btn-sm btn-secondary" onclick="openDbTable('users')">عرض</button></td></tr>
+                <tr><td><strong>📦 المنتجات</strong></td><td id="db-products-count">-</td><td id="db-products-date">-</td><td><span class="badge badge-success">نشط</span></td><td><button class="btn btn-sm btn-secondary" onclick="openDbTable('products')">عرض</button></td></tr>
+                <tr><td><strong>🛒 الطلبات</strong></td><td id="db-orders-count">-</td><td id="db-orders-date">-</td><td><span class="badge badge-success">نشط</span></td><td><button class="btn btn-sm btn-secondary" onclick="openDbTable('orders')">عرض</button></td></tr>
+                <tr><td><strong>📅 الجلسات</strong></td><td id="db-bookings-count">-</td><td id="db-bookings-date">-</td><td><span class="badge badge-success">نشط</span></td><td><button class="btn btn-sm btn-secondary" onclick="openDbTable('bookings')">عرض</button></td></tr>
+              </tbody></table></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-db-users">
+          <div class="card"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);"><h3 style="margin: 0;">👥 جدول المستخدمين</h3><div><button class="btn btn-sm btn-secondary" onclick="switchDbTable('database')">← رجوع</button></div></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>ID</th><th>الاسم</th><th>البريد</th><th>الدور</th><th>تاريخ التسجيل</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="db-users-table"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-content" id="tab-db-products">
+          <div class="card"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);"><h3 style="margin: 0;">📦 جدول المنتجات</h3><div><button class="btn btn-sm btn-secondary" onclick="switchDbTable('database')">← رجوع</button></div></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>ID</th><th>الاسم</th><th>السعر</th><th>النوع</th><th>تاريخ الإضافة</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="db-products-table"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-content" id="tab-db-orders">
+          <div class="card"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);"><h3 style="margin: 0;">🛒 جدول الطلبات</h3><div><button class="btn btn-sm btn-secondary" onclick="switchDbTable('database')">← رجوع</button></div></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>ID</th><th>المستخدم</th><th>المنتج</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody id="db-orders-table"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-content" id="tab-db-bookings">
+          <div class="card"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);"><h3 style="margin: 0;">📅 جدول الجلسات</h3><div><button class="btn btn-sm btn-secondary" onclick="switchDbTable('database')">← رجوع</button></div></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>ID</th><th>المستخدم</th><th>الخدمة</th><th>التاريخ</th><th>الوقت</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="db-bookings-table"></tbody></table></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal">
+      <div class="modal-header"><h3 id="product-modal-title">إضافة منتج جديد</h3><button class="modal-close" onclick="closeModal('product-modal')">✕</button></div>
+      <form id="product-form">
+        <input type="hidden" id="product-id">
+        <div class="form-group"><label class="form-label">الاسم (إنجليزي)</label><input type="text" id="product-name" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">الاسم (عربي)</label><input type="text" id="product-name-ar" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">الوصف</label><textarea id="product-desc" class="form-textarea"></textarea></div>
+        <div class="form-group"><label class="form-label">السعر ($)</label><input type="number" id="product-price" class="form-input" step="0.01" value="0"></div>
+        <div class="form-group"><label class="form-label">النوع</label><select id="product-type" class="form-select"><option value="free">مجاني</option><option value="paid">مدفوع</option></select></div>
+        <div class="form-group"><label class="form-label">الإصدار</label><input type="text" id="product-version" class="form-input" value="1.0.0"></div>
+        <div class="form-group"><label class="form-label">الفئة</label><input type="text" id="product-category" class="form-input" placeholder="general"></div>
+        <div class="form-group">
+          <label class="form-label">ملف المنتج (يدعم حتى 20GB)</label>
+          <input type="file" id="product-file" class="form-input" accept="*">
+          <div id="upload-progress" style="display: none; margin-top: 10px;">
+            <div style="background: var(--bg-secondary); border-radius: 8px; height: 20px; overflow: hidden;">
+              <div id="progress-bar" style="background: var(--primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
+            </div>
+            <p id="upload-status" style="margin: 5px 0; font-size: 12px; color: var(--text-muted);">جاري الرفع...</p>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">حفظ</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="service-modal">
+    <div class="modal">
+      <div class="modal-header"><h3 id="service-modal-title">إضافة خدمة جديدة</h3><button class="modal-close" onclick="closeModal('service-modal')">✕</button></div>
+      <form id="service-form">
+        <input type="hidden" id="service-id">
+        <div class="form-group"><label class="form-label">الاسم (إنجليزي)</label><input type="text" id="service-name" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">الاسم (عربي)</label><input type="text" id="service-name-ar" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">الوصف</label><textarea id="service-desc" class="form-textarea"></textarea></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">حفظ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Ticket Modal -->
+  <div class="modal-overlay" id="ticket-modal">
+    <div class="modal">
+      <div class="modal-header"><h3 id="ticket-modal-title">إضافة تذكرة جديدة</h3><button class="modal-close" onclick="closeModal('ticket-modal')">✕</button></div>
+      <form id="ticket-form">
+        <input type="hidden" id="ticket-id">
+        <div class="form-group"><label class="form-label">عنوان التذكرة</label><input type="text" id="ticket-title" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">الوصف</label><textarea id="ticket-description" class="form-textarea" rows="4" required></textarea></div>
+        <div class="form-group"><label class="form-label">الخطورة</label><select id="ticket-priority" class="form-select"><option value="low">منخفضة</option><option value="medium" selected>متوسطة</option><option value="high">عالية</option><option value="critical">حرجة</option></select></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">إنشاء التذكرة</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="coupon-modal">
+    <div class="modal">
+      <div class="modal-header"><h3 id="coupon-modal-title">إضافة كود خصم</h3><button class="modal-close" onclick="closeModal('coupon-modal')">✕</button></div>
+      <form id="coupon-form">
+        <input type="hidden" id="coupon-id">
+        <div class="form-group"><label class="form-label">كود الخصم</label><input type="text" id="coupon-code" class="form-input" placeholder="مثال: SAVE20" required style="text-transform: uppercase;"></div>
+        <div class="form-group"><label class="form-label">الوصف</label><textarea id="coupon-description" class="form-textarea" placeholder="وصف اختياري"></textarea></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);">
+          <div class="form-group"><label class="form-label">نوع الخصم</label><select id="coupon-discount-type" class="form-select" required><option value="percentage">نسبة مئوية (%)</option><option value="fixed">مبلغ ثابت ($)</option></select></div>
+          <div class="form-group"><label class="form-label">قيمة الخصم</label><input type="number" id="coupon-discount-value" class="form-input" step="0.01" min="0" required></div>
+        </div>
+        <div class="form-group"><label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;"><input type="checkbox" id="coupon-active" style="width: 16px; height: 16px;" checked><span>مفعّل</span></label></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">حفظ</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/socket-client.js"></script>
+  <script>
+    requireAdmin();
+    
+    function initTheme() {
+      const savedTheme = localStorage.getItem('admin-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcon(savedTheme);
+    }
+    
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const newTheme = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('admin-theme', newTheme);
+      updateThemeIcon(newTheme);
+    }
+    
+    function updateThemeIcon(theme) {
+      const btn = document.getElementById('theme-toggle');
+      if (btn) btn.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+    }
+    
+    let notificationsOpen = false;
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notification-dropdown');
+      dropdown.classList.toggle('show');
+      notificationsOpen = dropdown.classList.contains('show');
+      if (notificationsOpen) loadNotifications();
+    }
+    
+    async function loadNotifications() {
+      try {
+        const cookieToken = document.cookie.split('; ').find(row => row.startsWith('client_token='))?.split('=')[1];
+        const headers = cookieToken ? { 'Authorization': `Bearer ${cookieToken}` } : {};
+        const response = await fetch('/api/admin/notifications', { headers, credentials: 'include' });
+        const data = await response.json();
+        const list = document.getElementById('notification-list');
+        const badge = document.getElementById('notification-count');
+        if (data.unreadCount > 0) { badge.style.display = 'flex'; badge.textContent = data.unreadCount > 99 ? '99+' : data.unreadCount; }
+        else { badge.style.display = 'none'; }
+        if (data.notifications && data.notifications.length > 0) {
+          list.innerHTML = data.notifications.map(n => '<div class="notification-item ' + (n.is_read ? '' : 'unread') + '" style="position:relative;"><div onclick="markNotificationRead(' + n.id + ')" style="cursor:pointer;flex:1;"><div style="font-weight: ' + (n.is_read ? 'normal' : '600') + '">' + n.title + '</div><div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">' + n.message + '</div></div><button onclick="event.stopPropagation();deleteAdminNotification(' + n.id + ')" title="حذف" style="position:absolute;top:8px;left:8px;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:14px;padding:2px 6px;border-radius:4px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--text-muted)\'">✕</button></div>').join('');
+        } else { list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">لا توجد إشعارات</div>'; }
+      } catch (e) { console.error('Failed to load notifications:', e); }
+    }
+    
+    async function markNotificationRead(id) {
+      try {
+        const cookieToken = document.cookie.split('; ').find(row => row.startsWith('client_token='))?.split('=')[1];
+        const headers = cookieToken ? { 'Authorization': `Bearer ${cookieToken}` } : {};
+        await fetch('/api/admin/notifications/' + id + '/read', { method: 'PUT', headers, credentials: 'include' });
+        loadNotifications();
+      } catch (e) { console.error('Failed to mark notification read:', e); }
+    }
+    
+    async function deleteAdminNotification(id) {
+      try {
+        const cookieToken = document.cookie.split('; ').find(row => row.startsWith('client_token='))?.split('=')[1];
+        const headers = cookieToken ? { 'Authorization': `Bearer ${cookieToken}` } : {};
+        await fetch('/api/admin/notifications/' + id, { method: 'DELETE', headers, credentials: 'include' });
+        loadNotifications();
+      } catch (e) { console.error('Failed to delete notification:', e); }
+    }
+    
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('notification-dropdown');
+      const bell = document.querySelector('.notification-bell');
+      if (notificationsOpen && !dropdown.contains(e.target) && !bell.contains(e.target)) { dropdown.classList.remove('show'); notificationsOpen = false; }
+    });
+    
+    function showQuickAction(action) { 
+      console.log('Quick action called:', action);
+      if (action === 'broadcast') {
+        console.log('Calling showBroadcastModal');
+        showBroadcastModal(); 
+      }
+    }
+    
+    // Make functions globally accessible
+    window.showBroadcastModal = function() {
+      console.log('showBroadcastModal called');
+      try {
+        // Remove any existing modals first
+        const existingModal = document.getElementById('broadcast-modal');
+        if (existingModal) existingModal.remove();
+        
+        const modal = document.createElement('div');
+        modal.id = 'broadcast-modal';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+        modal.innerHTML = `
+          <div style="background: linear-gradient(145deg, #1a1a22, #141419); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; width: 90%; max-width: 500px; max-height: 90vh; overflow: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <h3 style="margin: 0; color: #fff; font-size: 18px;">📢 إرسال رسالة بث</h3>
+              <button onclick="document.getElementById('broadcast-modal').remove()" style="background: none; border: none; color: #71717a; font-size: 24px; cursor: pointer;">✕</button>
+            </div>
+            <div style="padding: 24px;">
+              <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; color: #a1a1aa; font-size: 14px;">عنوان الرسالة</label>
+                <input type="text" id="broadcast-title" placeholder="أدخل عنوان الرسالة" style="width: 100%; padding: 12px 16px; background: #0f0f14; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+              </div>
+              <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; color: #a1a1aa; font-size: 14px;">نص الرسالة</label>
+                <textarea id="broadcast-message" rows="5" placeholder="أدخل نص الرسالة" style="width: 100%; padding: 12px 16px; background: #0f0f14; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
+              </div>
+              <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #a1a1aa; font-size: 14px;">المستلمون</label>
+                <select id="broadcast-target" style="width: 100%; padding: 12px 16px; background: #0f0f14; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                  <option value="all">جميع المستخدمين</option>
+                  <option value="admins">المديرين فقط</option>
+                  <option value="users">المستخدمين العاديين</option>
+                </select>
+              </div>
+            </div>
+            <div style="padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: flex-end; gap: 12px;">
+              <button onclick="document.getElementById('broadcast-modal').remove()" style="padding: 10px 20px; background: rgba(255,255,255,0.1); border: none; border-radius: 8px; color: #a1a1aa; cursor: pointer;">إلغاء</button>
+              <button onclick="sendBroadcastMessage()" style="padding: 10px 24px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">إرسال</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        console.log('Modal created successfully');
+      } catch (e) {
+        console.error('Error creating modal:', e);
+        alert('Error: ' + e.message);
+      }
+    };
+    
+    window.sendBroadcastMessage = async function() {
+      const title = document.getElementById('broadcast-title').value;
+      const message = document.getElementById('broadcast-message').value;
+      const target = document.getElementById('broadcast-target').value;
+      
+      if (!title || !message) { 
+        alert('الرجاء إدخال العنوان والرسالة'); 
+        return; 
+      }
+      
+      try {
+        console.log('Sending broadcast:', {title, message, target_type: target});
+        const data = await apiRequest('/api/admin/broadcasts', { 
+          method: 'POST', 
+          body: JSON.stringify({ title, message, target_type: target }) 
+        });
+        
+        console.log('Broadcast created:', data);
+        document.getElementById('broadcast-modal').remove();
+        showNotification('✅ تم إنشاء البث بنجاح', 'success');
+        if (typeof loadBroadcasts === 'function') loadBroadcasts();
+      } catch (error) { 
+        console.error('Broadcast error:', error);
+        alert('❌ ' + (error.message || 'فشل في إنشاء البث')); 
+      }
+    };
+    
+    window.closeBroadcastModal = function() {
+      const modal = document.getElementById('broadcast-modal');
+      if (modal) modal.remove();
+    };
+    
+    initTheme();
+    loadNotifications();
+    setInterval(loadNotifications, 30000);
+
+    function toggleSidebar() {
+      document.querySelector('.admin-sidebar').classList.toggle('active');
+      document.querySelector('.admin-sidebar-overlay').classList.toggle('active');
+      document.getElementById('mobile-menu-toggle').classList.toggle('active');
+    }
+    
+    function scrollSidebar(direction) {
+      const sidebar = document.querySelector('.admin-nav');
+      const scrollAmount = 200;
+      if (direction === 'up') sidebar.scrollBy({ top: -scrollAmount, behavior: 'smooth' });
+      else sidebar.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+    }
+
+    function toggleMenu(menuId) {
+      const menuHeader = document.querySelector('[data-menu="' + menuId + '"]');
+      const submenu = document.getElementById('submenu-' + menuId);
+      if (!submenu) return;
+      const isOpen = submenu.classList.contains('open');
+      document.querySelectorAll('.admin-submenu').forEach(sm => { if (sm !== submenu) sm.classList.remove('open'); });
+      document.querySelectorAll('.admin-menu-header').forEach(h => { if (h !== menuHeader) h.classList.remove('active'); });
+      if (isOpen) { submenu.classList.remove('open'); menuHeader.classList.remove('active'); }
+      else { submenu.classList.add('open'); menuHeader.classList.add('active'); }
+    }
+
+    document.querySelectorAll('.admin-menu-header').forEach(header => {
+      header.addEventListener('click', function() { toggleMenu(this.getAttribute('data-menu')); });
+    });
+
+    document.querySelectorAll('.admin-nav-link').forEach(link => {
+      link.addEventListener('click', function() { if (window.innerWidth <= 768) toggleSidebar(); });
+    });
+
+    document.getElementById('mobile-menu-toggle').addEventListener('click', toggleSidebar);
+
+    const adminSocket = io();
+    adminSocket.on('new_session', (data) => { if (typeof loadSessions === 'function') loadSessions(); showNotification('جلسة جديدة من ' + (data.username || 'مستخدم'), 'info'); });
+    adminSocket.on('session_status_change', () => { if (typeof loadSessions === 'function') loadSessions(); });
+    
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      const bgColor = type === 'success' ? 'linear-gradient(135deg, #10b981, #059669)' : type === 'error' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #6366f1, #8b5cf6)';
+      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+      notification.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; padding: 14px 24px; border-radius: 12px; font-size: 14px; background: ' + bgColor + '; color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; font-weight: 500;';
+      notification.innerHTML = '<span style="font-size: 18px;">' + icon + '</span><span>' + message + '</span>';
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 4000);
+    }
+    
+    const locationKey = btoa(navigator.userAgent).slice(0, 16);
+    
+    function encryptPassword(password, key) {
+      let result = '';
+      for (let i = 0; i < password.length; i++) { result += String.fromCharCode(password.charCodeAt(i) ^ key.charCodeAt(i % key.length)); }
+      return btoa(result);
+    }
+    
+    let dbAuthenticated = false;
+    let dbAuthToken = null;
+    
+    async function verifyDbAdmin() {
+      const passwordInput = document.getElementById('db-admin-password');
+      const errorMsg = document.getElementById('db-auth-error');
+      const password = passwordInput.value;
+      if (!password) { errorMsg.textContent = 'يرجى إدخال كلمة المرور'; errorMsg.style.display = 'block'; return; }
+      const encryptedPassword = encryptPassword(password, locationKey);
+      try {
+        const response = await fetch('/api/admin/verify-db-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: encryptedPassword, key: locationKey }) });
+        const data = await response.json();
+        if (data.success) {
+          dbAuthenticated = true;
+          dbAuthToken = data.token;
+          document.getElementById('db-auth-section').style.display = 'none';
+          document.getElementById('db-tables-section').style.display = 'block';
+          loadDatabaseStats();
+        } else { errorMsg.textContent = 'كلمة المرور غير صحيحة'; errorMsg.style.display = 'block'; }
+      } catch (error) { errorMsg.textContent = 'خطأ في الاتصال بالخادم'; errorMsg.style.display = 'block'; }
+    }
+    
+    function lockDatabase() {
+      dbAuthenticated = false;
+      dbAuthToken = null;
+      document.getElementById('db-auth-section').style.display = 'block';
+      document.getElementById('db-tables-section').style.display = 'none';
+      document.getElementById('db-admin-password').value = '';
+      document.getElementById('db-auth-error').style.display = 'none';
+    }
+    
+    async function loadDatabaseStats() {
+      try {
+        const cookieToken = document.cookie.split('; ').find(row => row.startsWith('client_token='))?.split('=')[1];
+        const authToken = dbAuthToken || cookieToken;
+        const headers = authToken ? { 'Authorization': 'Bearer ' + authToken } : {};
+        const response = await fetch('/api/admin/db-stats', { headers, credentials: 'include' });
+        const stats = await response.json();
+        if (stats.users !== undefined) document.getElementById('db-users-count').textContent = stats.users.count;
+        if (stats.products !== undefined) document.getElementById('db-products-count').textContent = stats.products.count;
+        if (stats.orders !== undefined) document.getElementById('db-orders-count').textContent = stats.orders.count;
+        if (stats.bookings !== undefined) document.getElementById('db-bookings-count').textContent = stats.bookings.count;
+      } catch (error) { console.error('Error loading stats:', error); }
+    }
+    
+    function switchDbTable(tab) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.querySelectorAll('.admin-nav-link, .admin-submenu-item').forEach(l => l.classList.remove('active'));
+    }
+    
+    function openDbTable(tableName) {
+      if (!dbAuthenticated) { showNotification('يرجى التحقق من هويتك أولاً', 'error'); return; }
+      const tabMap = { 'users': 'db-users', 'products': 'db-products', 'orders': 'db-orders', 'bookings': 'db-bookings' };
+      const tabId = tabMap[tableName];
+      if (tabId) { switchDbTable(tabId); loadDbTableData(tableName); }
+    }
+    
+    async function loadDbTableData(tableName) {
+      const tbodyId = 'db-' + tableName + '-table';
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">جاري التحميل...</td></tr>';
+      try {
+        const cookieToken = document.cookie.split('; ').find(row => row.startsWith('client_token='))?.split('=')[1];
+        const authToken = dbAuthToken || cookieToken;
+        const headers = authToken ? { 'Authorization': 'Bearer ' + authToken } : {};
+        const response = await fetch('/api/admin/db-table/' + tableName, { headers, credentials: 'include' });
+        const data = await response.json();
+        if (data.success && data.records) renderDbTable(tableName, data.records, tbody);
+        else tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بيانات</td></tr>';
+      } catch (error) { renderDbTable(tableName, [], tbody); }
+    }
+    
+    function renderDbTable(tableName, records, tbody) {
+      if (!records || records.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد سجلات</td></tr>'; return; }
+      let html = '';
+      records.forEach(record => {
+        const id = record.id || record._id || '-';
+        const actions = '<button class="btn btn-sm btn-secondary" onclick="editDbRecord(\'' + tableName + '\', \'' + id + '\')">✏️ تعديل</button><button class="btn btn-sm btn-danger" onclick="deleteDbRecord(\'' + tableName + '\', \'' + id + '\')">🗑️ حذف</button>';
+        if (tableName === 'users') { html += '<tr><td>' + id + '</td><td>' + (record.username || record.name || '-') + '</td><td>' + (record.email || '-') + '</td><td>' + (record.role || 'user') + '</td><td>' + (record.created_at ? new Date(record.created_at).toLocaleDateString('ar') : '-') + '</td><td><span class="badge badge-success">نشط</span></td><td>' + actions + '</td></tr>'; }
+        else if (tableName === 'products') { html += '<tr><td>' + id + '</td><td>' + (record.name || record.name_ar || '-') + '</td><td>' + (record.price || 0) + '</td><td>' + (record.type || 'free') + '</td><td>' + (record.created_at ? new Date(record.created_at).toLocaleDateString('ar') : '-') + '</td><td><span class="badge badge-success">نشط</span></td><td>' + actions + '</td></tr>'; }
+        else { html += '<tr><td>' + id + '</td><td colspan="6">' + JSON.stringify(record).substring(0, 100) + '...</td></tr>'; }
+      });
+      tbody.innerHTML = html;
+    }
+    
+    async function deleteDbRecord(tableName, id) {
+      if (!dbAuthenticated) { showNotification('يرجى التحقق من هويتك أولاً', 'error'); return; }
+      try {
+        const response = await fetch('/api/admin/db-delete/' + tableName + '/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + dbAuthToken } });
+        const data = await response.json();
+        if (data.success) { showNotification('تم حذف السجل بنجاح', 'success'); loadDbTableData(tableName); loadDatabaseStats(); }
+        else { showNotification('فشل حذف السجل', 'error'); }
+      } catch (error) { showNotification('خطأ في الاتصال بالخادم', 'error'); }
+    }
+
+    document.querySelectorAll('.admin-nav-link, .admin-submenu-item').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const tab = this.dataset.tab;
+        if (!tab) return;
+        document.querySelectorAll('.admin-nav-link, .admin-submenu-item').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        const tabElement = document.getElementById('tab-' + tab);
+        if (tabElement) tabElement.classList.add('active');
+        if (window.innerWidth <= 768) toggleSidebar();
+
+        if (tab === 'notifications') loadAdminNotifications();
+        if (tab === 'api-usage') loadApiUsage();
+        if (tab === 'firewall') loadCyberDashboard();
+      });
+    });
+
+    function showProductModal(product = null) {
+      const modal = document.getElementById('product-modal');
+      if (product) {
+        document.getElementById('product-modal-title').textContent = 'تعديل منتج';
+        document.getElementById('product-id').value = product.id;
+        document.getElementById('product-name').value = product.name;
+        document.getElementById('product-name-ar').value = product.name_ar;
+        document.getElementById('product-desc').value = product.description || '';
+        document.getElementById('product-price').value = product.price;
+        document.getElementById('product-type').value = product.is_free ? 'free' : 'paid';
+        document.getElementById('product-version').value = product.version || '1.0.0';
+        document.getElementById('product-category').value = product.category || 'general';
+        document.getElementById('product-file').value = '';
+      } else {
+        document.getElementById('product-modal-title').textContent = 'إضافة منتج جديد';
+        document.getElementById('product-form').reset();
+        document.getElementById('product-id').value = '';
+        document.getElementById('product-version').value = '1.0.0';
+        document.getElementById('product-category').value = 'general';
+        document.getElementById('product-file').value = '';
+      }
+      document.getElementById('upload-progress').style.display = 'none';
+      modal.classList.add('active');
+    }
+
+    function showCreateTicketModal(ticket = null) {
+      const modal = document.getElementById('ticket-modal');
+      if (ticket) {
+        document.getElementById('ticket-modal-title').textContent = 'تعديل تذكرة';
+        document.getElementById('ticket-id').value = ticket.id;
+        document.getElementById('ticket-title').value = ticket.title;
+        document.getElementById('ticket-description').value = ticket.description || '';
+        document.getElementById('ticket-priority').value = ticket.priority || 'medium';
+      } else {
+        document.getElementById('ticket-modal-title').textContent = 'إضافة تذكرة جديدة';
+        document.getElementById('ticket-form').reset();
+        document.getElementById('ticket-id').value = '';
+      }
+      modal.classList.add('active');
+    }
+
+    // Ticket form submission
+    document.getElementById('ticket-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('ticket-id').value;
+      const data = {
+        title: document.getElementById('ticket-title').value,
+        description: document.getElementById('ticket-description').value,
+        priority: document.getElementById('ticket-priority').value
+      };
+      try {
+        if (id) {
+          await apiRequest('/api/support/tickets/' + id, { method: 'PUT', body: JSON.stringify(data) });
+          showNotification('تم التحديث بنجاح', 'success');
+        } else {
+          await apiRequest('/api/support/tickets', { method: 'POST', body: JSON.stringify(data) });
+          showNotification('تم إنشاء التذكرة بنجاح', 'success');
+        }
+        closeModal('ticket-modal');
+        loadTickets();
+      } catch (error) {
+        showNotification(error.message, 'error');
+      }
+    });
+
+    function showServiceModal(service = null) {
+      const modal = document.getElementById('service-modal');
+      if (service) {
+        document.getElementById('service-modal-title').textContent = 'تعديل خدمة';
+        document.getElementById('service-id').value = service.id;
+        document.getElementById('service-name').value = service.name;
+        document.getElementById('service-name-ar').value = service.name_ar;
+        document.getElementById('service-desc').value = service.description || '';
+      } else {
+        document.getElementById('service-modal-title').textContent = 'إضافة خدمة جديدة';
+        document.getElementById('service-form').reset();
+        document.getElementById('service-id').value = '';
+      }
+      modal.classList.add('active');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('active');
+    }
+
+    async function loadDashboard() {
+      const isAdmin = await requireAdmin();
+      if (!isAdmin) return;
+      try {
+        const data = await apiRequest('/api/admin/dashboard');
+        document.getElementById('stat-users').textContent = data.users.total;
+        document.getElementById('stat-products').textContent = data.products.total;
+        document.getElementById('stat-tickets').textContent = data.tickets.total;
+        document.getElementById('stat-messages').textContent = data.messages.unread;
+        
+        const user = await getCurrentUser();
+        if (user) {
+          const roleNames = { 'admin': 'مدير', 'manager': 'مدير مستخدمين', 'moderator': 'مشرف', 'user': 'مستخدم' };
+          document.getElementById('admin-info').textContent = user.email + ' (' + (roleNames[user.role] || user.role) + ')';
+          applyRolePermissions(user.role);
+        }
+        
+        document.getElementById('recent-activity').innerHTML = data.recentActivity.slice(0, 8).map(log => '<div class="activity-item"><div class="activity-icon">📝</div><div><div class="activity-title">' + log.action + '</div><div class="activity-meta">' + (log.username || 'نظام') + ' - ' + formatDate(log.created_at) + '</div></div></div>').join('') || '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">لا يوجد نشاط حديث</div></div>';
+        
+        loadUsers(); loadProducts(); loadServices(); loadTickets(); loadSessions(); loadMessages(); loadCoupons();
+        loadAnalytics(); loadSystemHealth(); loadErrorLogs(); loadBroadcasts(); loadAutoResponses();
+      } catch (error) { console.error('Error loading dashboard:', error); }
+    }
+    
+    function applyRolePermissions(role) {
+      // Hide sidebar items based on role
+      document.querySelectorAll('[data-roles]').forEach(el => {
+        const allowedRoles = el.getAttribute('data-roles').split(',').map(r => r.trim());
+        el.style.display = allowedRoles.includes(role) ? '' : 'none';
+      });
+    }
+
+    async function loadUsers() {
+      try {
+        const data = await apiRequest('/api/admin/users');
+        const roleNames = { 'admin': 'مدير', 'manager': 'مدير مستخدمين', 'moderator': 'مشرف', 'user': 'مستخدم' };
+        const roleClasses = { 'admin': 'badge-error', 'manager': 'badge-warning', 'moderator': 'badge-primary', 'user': 'badge-success' };
+        document.getElementById('users-table').innerHTML = data.users.map(u => '<tr><td><div class="user-cell"><span class="user-name">' + u.username + '</span></div></td><td><span class="email-text">' + u.email + '</span></td><td><span class="badge ' + (roleClasses[u.role] || 'badge-success') + '">' + (roleNames[u.role] || u.role) + '</span></td><td><span class="badge ' + (u.is_verified ? 'badge-success' : 'badge-warning') + '">' + (u.is_verified ? 'موثق' : 'غير موثق') + '</span></td><td><div class="table-actions"><button class="action-btn" title="تعديل" onclick=\'showUserModal(' + JSON.stringify(u) + ')\'>✏️</button><button class="action-btn danger" title="حذف" onclick="deleteUser(' + u.id + ')">🗑️</button></div></td></tr>').join('');
+      } catch (error) { console.error('Error loading users:', error); }
+    }
+    
+    function showUserModal(user = null) {
+      const isEdit = !!user;
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.innerHTML = '<div class="modal"><div class="modal-header"><h3>' + (isEdit ? 'تعديل مستخدم' : 'إضافة مستخدم جديد') + '</h3><button class="modal-close" onclick="closeUserModal(this)">✕</button></div><form onsubmit="saveUser(event' + (isEdit ? ', ' + user.id : '') + ')"><div class="form-group"><label class="form-label">اسم المستخدم</label><input type="text" name="username" class="form-input" value="' + (user?.username || '') + '" required></div><div class="form-group"><label class="form-label">البريد الإلكتروني</label><input type="email" name="email" class="form-input" value="' + (user?.email || '') + '" required></div>' + (!isEdit ? '<div class="form-group"><label class="form-label">كلمة المرور</label><input type="password" name="password" class="form-input" required></div>' : '') + '<div class="form-group"><label class="form-label">الدور</label><select name="role" class="form-select" required><option value="user" ' + (user?.role === 'user' ? 'selected' : '') + '>مستخدم</option><option value="moderator" ' + (user?.role === 'moderator' ? 'selected' : '') + '>مشرف</option><option value="manager" ' + (user?.role === 'manager' ? 'selected' : '') + '>مدير مستخدمين</option><option value="admin" ' + (user?.role === 'admin' ? 'selected' : '') + '>مدير</option></select></div><div class="form-group"><label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;"><input type="checkbox" name="is_verified" ' + (user?.is_verified ? 'checked' : '') + ' style="width: 16px; height: 16px;"><span>حساب موثق</span></label></div><div style="display: flex; gap: var(--space-3); justify-content: flex-end;"><button type="button" class="btn btn-secondary" onclick="closeUserModal(this)">إلغاء</button><button type="submit" class="btn btn-primary">' + (isEdit ? 'حفظ' : 'إنشاء') + '</button></div></form></div>';
+      document.body.appendChild(modal);
+      requestAnimationFrame(() => { modal.classList.add('active'); });
+    }
+    
+    function closeUserModal(element) {
+      const modal = element.closest('.modal-overlay');
+      if (modal) { modal.classList.remove('active'); setTimeout(() => modal.remove(), 250); }
+    }
+    
+    async function saveUser(event, userId = null) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const data = { username: formData.get('username'), email: formData.get('email'), role: formData.get('role'), is_verified: form.querySelector('input[name="is_verified"]')?.checked || false };
+      if (!userId) data.password = formData.get('password');
+      try {
+        const method = userId ? 'PUT' : 'POST';
+        const endpoint = userId ? '/api/admin/users/' + userId : '/api/admin/users';
+        await apiRequest(endpoint, { method: method, body: JSON.stringify(data) });
+        document.querySelector('.modal-overlay')?.remove();
+        loadUsers();
+        showNotification(userId ? 'تم التحديث بنجاح' : 'تم الإنشاء بنجاح', 'success');
+      } catch (error) { showNotification(error.message || 'حدث خطأ', 'error'); }
+    }
+
+    async function loadProducts() {
+      try {
+        const data = await apiRequest('/api/products');
+        document.getElementById('products-table').innerHTML = data.products.map(p => '<tr><td>' + p.name_ar + '</td><td>' + (p.is_free ? 'مجاني' : '$' + p.price) + '</td><td><span class="badge ' + (p.is_free ? 'badge-open' : 'badge-in_progress') + '">' + (p.is_free ? 'مجاني' : 'مدفوع') + '</span></td><td><button class="action-btn" onclick=\'showProductModal(' + JSON.stringify(p) + ')\'>✏️</button><button class="action-btn danger" onclick="deleteProduct(' + p.id + ')">🗑️</button></td></tr>').join('');
+      } catch (error) { console.error('Error loading products:', error); }
+    }
+
+    async function loadServices() {
+      try {
+        const data = await apiRequest('/api/admin/services');
+        document.getElementById('services-table').innerHTML = data.services.map(s => '<tr><td>' + s.name_ar + '</td><td>' + (s.description_ar || '-') + '</td><td><button class="action-btn" onclick=\'showServiceModal(' + JSON.stringify(s) + ')\'>✏️</button><button class="action-btn danger" onclick="deleteService(' + s.id + ')">🗑️</button></td></tr>').join('');
+      } catch (error) { console.error('Error loading services:', error); }
+    }
+
+    async function loadTickets() {
+      try {
+        const data = await apiRequest('/api/support/admin/tickets');
+        document.getElementById('tickets-table').innerHTML = data.tickets.map(t => '<tr><td>#' + t.id + '</td><td>' + t.title + '</td><td>' + (t.username || '-') + '</td><td><span class="badge badge-' + (t.priority === 'critical' ? 'error' : t.priority === 'high' ? 'warning' : t.priority === 'medium' ? 'primary' : 'success') + '">' + t.priority + '</span></td><td><span class="badge badge-' + (t.status === 'open' ? 'success' : t.status === 'closed' ? 'error' : 'warning') + '">' + (t.status === 'open' ? 'مفتوح' : t.status === 'closed' ? 'مغلق' : t.status === 'in_progress' ? 'قيد التنفيذ' : t.status) + '</span></td><td>' + formatDate(t.created_at) + '</td><td><button class="action-btn" onclick="viewTicket(' + t.id + ')">👁️</button><button class="action-btn danger" onclick="deleteTicket(' + t.id + ')">🗑️</button></td></tr>').join('');
+      } catch (error) { console.error('Error loading tickets:', error); }
+    }
+
+    async function viewTicket(id) {
+      try {
+        const data = await apiRequest('/api/support/tickets/' + id);
+        alert('التذكرة #' + id + '\n\nالعنوان: ' + data.ticket.title + '\n\nالوصف: ' + data.ticket.description + '\n\nالحالة: ' + data.ticket.status + '\nالخطورة: ' + data.ticket.priority);
+      } catch (error) { showNotification('خطأ في تحميل التذكرة', 'error'); }
+    }
+
+    async function deleteTicket(id) {
+      try {
+        await apiRequest('/api/support/tickets/' + id, { method: 'DELETE' });
+        loadTickets();
+        showNotification('تم حذف التذكرة', 'success');
+      } catch (error) { showNotification(error.message, 'error'); }
+    }
+
+    async function loadSessions() {
+      try {
+        const data = await apiRequest('/api/sessions/admin/all');
+        const stats = await apiRequest('/api/sessions/admin/stats');
+        document.getElementById('bookings-pending').textContent = stats.pending;
+        document.getElementById('bookings-accepted').textContent = stats.confirmed;
+        document.getElementById('bookings-rejected').textContent = stats.rejected;
+        document.getElementById('bookings-completed').textContent = stats.completed;
+        document.getElementById('sessions-table').innerHTML = data.sessions.map(s => '<tr><td>' + s.username + '<br><small class="text-muted">' + s.email + '</small></td><td>' + getSessionTypeName(s.session_type) + '</td><td>' + formatDate(s.preferred_date) + '</td><td>' + s.preferred_time + '</td><td>' + s.duration + ' دقيقة</td><td><span class="badge badge-' + (s.status === 'pending' ? 'warning' : s.status === 'confirmed' ? 'success' : s.status === 'rejected' ? 'error' : 'primary') + '">' + getSessionStatus(s.status) + '</span></td><td>' + (s.status === 'pending' ? '<button class="action-btn" onclick="confirmSession(' + s.id + ')">✓</button><button class="action-btn danger" onclick="rejectSession(' + s.id + ')">✕</button>' : s.status === 'confirmed' ? '<button class="action-btn" onclick="completeSession(' + s.id + ')">✓</button>' : '') + '<button class="action-btn danger" onclick="deleteSession(' + s.id + ')">🗑️</button></td></tr>').join('');
+      } catch (error) { console.error('Error loading sessions:', error); }
+    }
+
+    function getSessionTypeName(type) { const types = { consultation: 'استشارة', development: 'تطوير', support: 'دعم', training: 'تدريب', meeting: 'اجتماع', custom: 'مخصص' }; return types[type] || type; }
+    function getSessionStatus(status) { const map = { pending: 'معلق', confirmed: 'مؤكد', rejected: 'مرفوض', completed: 'مكتمل', cancelled: 'ملغي' }; return map[status] || status; }
+    function formatDate(dateStr) { return new Date(dateStr).toLocaleDateString('ar-SA'); }
+
+    async function confirmSession(id) { try { await apiRequest('/api/sessions/admin/' + id + '/confirm', { method: 'POST' }); loadSessions(); showNotification('تم تأكيد الحجز', 'success'); } catch (error) { showNotification(error.message, 'error'); } }
+    async function rejectSession(id) { try { await apiRequest('/api/sessions/admin/' + id + '/reject', { method: 'POST' }); loadSessions(); showNotification('تم رفض الحجز', 'success'); } catch (error) { showNotification(error.message, 'error'); } }
+    async function completeSession(id) { try { await apiRequest('/api/sessions/admin/' + id + '/complete', { method: 'POST' }); loadSessions(); showNotification('تم إكمال الحجز', 'success'); } catch (error) { showNotification(error.message, 'error'); } }
+    async function deleteSession(id) { try { await apiRequest('/api/sessions/admin/' + id, { method: 'DELETE' }); loadSessions(); showNotification('تم حذف الحجز بنجاح', 'success'); } catch (error) { showNotification(error.message, 'error'); } }
+
+    async function loadMessages() {
+      try {
+        const data = await apiRequest('/api/admin/messages');
+        document.getElementById('messages-table').innerHTML = data.messages.map(m => '<tr><td>' + m.name + '</td><td>' + (m.phone || '-') + '</td><td>' + (m.email || '-') + '</td><td>' + (m.subject || '-') + '</td><td>' + formatDate(m.created_at) + '</td><td><button class="action-btn danger" onclick="deleteMessage(' + m.id + ')">🗑️</button></td></tr>').join('');
+      } catch (error) { console.error('Error loading messages:', error); }
+    }
+
+    async function loadCoupons() {
+      try {
+        const coupons = await apiRequest('/api/payment/admin/coupons');
+        document.getElementById('coupons-table').innerHTML = coupons.map(c => {
+          let statusBadge = '<span class="badge badge-success">مفعّل</span>';
+          if (!c.is_active) statusBadge = '<span class="badge badge-error">معطّل</span>';
+          else if (c.expires_at && new Date(c.expires_at) < new Date()) statusBadge = '<span class="badge badge-warning">منتهي</span>';
+          return '<tr><td><code style="background: rgba(99,102,241,0.1); padding: 2px 6px; border-radius: 4px;">' + c.code + '</code></td><td>' + (c.description || '-') + '</td><td>' + (c.discount_type === 'percentage' ? 'نسبة' : 'مبلغ') + '</td><td>' + (c.discount_type === 'percentage' ? c.discount_value + '%' : '$' + c.discount_value) + '</td><td>' + c.current_uses + (c.max_uses ? ' / ' + c.max_uses : '') + '</td><td>' + (c.expires_at ? formatDate(c.expires_at) : '-') + '</td><td>' + statusBadge + '</td><td><button class="action-btn" onclick="editCoupon(' + c.id + ')">✏️</button><button class="action-btn danger" onclick="deleteCoupon(' + c.id + ')">🗑️</button></td></tr>';
+        }).join('') || '<tr><td colspan="8" class="empty-state">لا توجد أكواد خصم</td></tr>';
+      } catch (error) { console.error('Error loading coupons:', error); }
+    }
+
+    async function loadAdminNotifications() {
+      try {
+        const data = await apiRequest('/api/admin/notifications');
+        const table = document.getElementById('notifications-admin-table');
+        if (!data.notifications || data.notifications.length === 0) {
+          table.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px; color: var(--text-muted);">لا توجد إشعارات</td></tr>';
+          return;
+        }
+        table.innerHTML = data.notifications.map(n => {
+          const typeLabels = { 'system': 'نظام', 'support': 'دعم', 'booking': 'حجز', 'payment': 'دفع', 'order': 'طلب' };
+          const typeLabel = typeLabels[n.type] || n.type;
+          return '<tr>' +
+            '<td style="font-weight: ' + (n.is_read ? 'normal' : '600') + '">' + n.title + '</td>' +
+            '<td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + n.message + '</td>' +
+            '<td><span class="badge badge-info">' + typeLabel + '</span></td>' +
+            '<td>' + (n.is_read ? '<span class="badge badge-success">مقروء</span>' : '<span class="badge badge-warning">غير مقروء</span>') + '</td>' +
+            '<td>' + formatDate(n.created_at) + '</td>' +
+            '<td>' +
+              '<button class="action-btn danger" onclick="deleteAdminNotificationById(' + n.id + ')" title="حذف">🗑️</button>' +
+            '</td>' +
+          '</tr>';
+        }).join('');
+      } catch (error) { console.error('Error loading notifications:', error); }
+    }
+
+    async function loadApiUsage() {
+      try {
+        const data = await apiRequest('/api/admin/api-usage');
+        const el = document.getElementById('api-stats');
+        el.innerHTML =
+          '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">' +
+            '<div style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.05)); border: 1px solid rgba(99,102,241,0.3); border-radius: 12px; padding: 20px;">' +
+              '<div style="font-size: 13px; color: var(--text-muted);">إجمالي الطلبات (30 يوم)</div>' +
+              '<div style="font-size: 28px; font-weight: 700; color: #6366f1; margin-top: 4px;">' + data.totalRequests + '</div>' +
+            '</div>' +
+            '<div style="background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05)); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 20px;">' +
+              '<div style="font-size: 13px; color: var(--text-muted);">طلبات اليوم</div>' +
+              '<div style="font-size: 28px; font-weight: 700; color: #10b981; margin-top: 4px;">' + data.todayRequests + '</div>' +
+            '</div>' +
+            '<div style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 20px;">' +
+              '<div style="font-size: 13px; color: var(--text-muted);">المستخدمين النشطين (7 أيام)</div>' +
+              '<div style="font-size: 28px; font-weight: 700; color: #f59e0b; margin-top: 4px;">' + data.activeUsers + '</div>' +
+            '</div>' +
+            '<div style="background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(139,92,246,0.05)); border: 1px solid rgba(139,92,246,0.3); border-radius: 12px; padding: 20px;">' +
+              '<div style="font-size: 13px; color: var(--text-muted);">إجمالي المستخدمين</div>' +
+              '<div style="font-size: 28px; font-weight: 700; color: #8b5cf6; margin-top: 4px;">' + data.totalUsers + '</div>' +
+            '</div>' +
+          '</div>' +
+          (data.topActions && data.topActions.length > 0 ?
+            '<div style="margin-top: 16px;"><h4 style="margin: 0 0 12px 0; color: var(--text-primary);">أكثر الطلبات استخداماً (7 أيام)</h4>' +
+            '<table class="data-table"><thead><tr><th>الإجراء</th><th>العدد</th></tr></thead><tbody>' +
+            data.topActions.map(a => '<tr><td>' + a.action + '</td><td><span class="badge badge-info">' + a.count + '</span></td></tr>').join('') +
+            '</tbody></table></div>' : '') +
+          (data.requestsByDay && data.requestsByDay.length > 0 ?
+            '<div style="margin-top: 24px;"><h4 style="margin: 0 0 12px 0; color: var(--text-primary);">الطلبات حسب اليوم (7 أيام)</h4>' +
+            '<table class="data-table"><thead><tr><th>التاريخ</th><th>العدد</th></tr></thead><tbody>' +
+            data.requestsByDay.map(d => '<tr><td>' + d.date + '</td><td><span class="badge badge-success">' + d.count + '</span></td></tr>').join('') +
+            '</tbody></table></div>' : '');
+      } catch (error) {
+        console.error('Error loading API usage:', error);
+        document.getElementById('api-stats').innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">خطأ في تحميل البيانات</div>';
+      }
+    }
+
+    // ================================================================
+    // CYBERSECURITY OPERATIONS CENTER
+    // ================================================================
+
+    let cyberInterval = null;
+    let cyberData = {};
+
+    function showCyberTab(name) {
+      document.querySelectorAll('.ctab-panel').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.cyber-tab').forEach(b => b.classList.remove('active'));
+      const panel = document.getElementById('ctab-' + name);
+      if (panel) panel.style.display = 'block';
+      const btn = document.querySelector('[data-ctab="' + name + '"]');
+      if (btn) btn.classList.add('active');
+
+      if (name === 'rules') loadRules();
+      if (name === 'connections') loadConnections();
+      if (name === 'threats') loadThreats();
+      if (name === 'waf') loadWAFLogs(1);
+      if (name === 'blocked') loadBlockedIPs();
+      if (name === 'logins') loadLoginHistory(1);
+      if (name === 'events') loadSecurityEvents(1);
+    }
+
+    function toggleCyberAutoRefresh() {
+      const val = parseInt(document.getElementById('cyber-auto-refresh').value);
+      if (cyberInterval) { clearInterval(cyberInterval); cyberInterval = null; }
+      if (val > 0) cyberInterval = setInterval(() => loadCyberDashboard(), val * 1000);
+    }
+
+    async function loadCyberDashboard() {
+      try {
+        const data = await apiRequest('/api/admin/cybersecurity/dashboard');
+        cyberData = data;
+        const s = data.stats;
+
+        // Stats row
+        document.getElementById('cyber-stats-row').innerHTML =
+          cyberStat('إجمالي التهديدات', s.totalThreats, '#ef4444') +
+          cyberStat('تهديدات 24 ساعة', s.threats24h, '#f59e0b') +
+          cyberStat('محظور 24 ساعة', s.blocked24h, '#10b981') +
+          cyberStat('عناوين محظورة', s.blockedIPs, '#6366f1') +
+          cyberStat('دخول فاشل', s.failedLogins24h, '#ef4444') +
+          cyberStat('دخول ناجح', s.successfulLogins24h, '#10b981') +
+          cyberStat('مستخدمين', s.activeUsers, '#8b5cf6') +
+          cyberStat('قواعد iptables', data.perf.rulesCount, '#3b82f6');
+
+        // Packet chart
+        renderPacketChart(data.pktStats);
+
+        // Hourly chart
+        renderHourlyChart(data.hourlyAttacks);
+
+        // Connection states
+        const cs = data.connSummary;
+        document.getElementById('cyber-conn-states').innerHTML =
+          cyberBar([
+            { val: cs.established, label: 'نشط', color: '#10b981' },
+            { val: cs.listen, label: 'يستمع', color: '#6366f1' },
+            { val: cs.timewait, label: 'انتظار', color: '#f59e0b' },
+            { val: cs.synRecv, label: 'SYN', color: '#ef4444' },
+            { val: cs.closed, label: 'مغلق', color: '#64748b' }
+          ], cs.established + cs.listen + cs.timewait + cs.synRecv + cs.closed);
+
+        // Performance
+        const p = data.perf;
+        document.getElementById('cyber-perf').innerHTML =
+          '<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">قواعد الإدخال: <b style="color:var(--text-primary);">' + p.inputRules + '</b></div>' +
+          '<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">قواعد الإخراج: <b style="color:var(--text-primary);">' + p.outputRules + '</b></div>' +
+          '<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">نسبة الرفض: <b style="color:' + (parseFloat(p.dropRate) > 5 ? '#ef4444' : '#10b981') + ';">' + p.dropRate + '</b></div>' +
+          '<div style="font-size:12px;color:var(--text-muted);">النواة: <b style="color:var(--text-primary);">' + (p.kernelVersion || '-') + '</b></div>';
+
+        // Threat sources
+        if (data.threatTypes.length > 0) {
+          const maxT = Math.max(...data.threatTypes.map(t => t.count));
+          document.getElementById('cyber-threat-src').innerHTML = data.threatTypes.slice(0, 5).map(t =>
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><span style="width:90px;font-size:11px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + t.threat_type + '</span><div style="flex:1;background:rgba(239,68,68,0.15);border-radius:4px;height:16px;overflow:hidden;"><div style="width:' + (t.count/maxT*100) + '%;height:100%;background:linear-gradient(90deg,#ef4444,#f59e0b);border-radius:4px;"></div></div><span style="font-size:10px;color:var(--text-muted);width:40px;text-align:right;">' + t.count + '</span></div>'
+          ).join('');
+        } else {
+          document.getElementById('cyber-threat-src').innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:10px;text-align:center;">لا توجد هجمات</div>';
+        }
+
+        // Alerts bar
+        let alertsHTML = '';
+        if (data.suspicious.length > 0) {
+          for (const s of data.suspicious) {
+            const icon = s.severity === 'high' ? '' : s.severity === 'medium' ? '⚠️' : 'ℹ️';
+            alertsHTML += '<div class="cyber-alert ' + s.severity + '">' + icon + ' ' + s.description + '</div>';
+          }
+        }
+        if (data.threatAnalysis.summary.high > 0) {
+          alertsHTML += '<div class="cyber-alert high"> ' + data.threatAnalysis.summary.high + ' تهديد عالي الخطورة في آخر 24 ساعة</div>';
+        }
+        document.getElementById('cyber-alerts-bar').innerHTML = alertsHTML || '';
+
+        // Top attackers
+        if (data.topAttackers.length > 0) {
+          document.getElementById('cyber-top-ips').innerHTML =
+            '<table class="data-table"><thead><tr><th>العنوان</th><th>الهجمات</th><th>محظور</th><th>آخر هجوم</th><th>إجراءات</th></tr></thead><tbody>' +
+            data.topAttackers.map(a => '<tr><td><code style="font-size:12px;">' + a.ip_address + '</code></td><td><span class="badge badge-warning">' + a.attacks + '</span></td><td><span class="badge badge-error">' + (a.blocked||0) + '</span></td><td style="font-size:11px;">' + formatDate(a.last_seen) + '</td><td><button class="action-btn danger" onclick="quickBlock(\'' + a.ip_address + '\')"> حظر</button></td></tr>').join('') +
+            '</tbody></table>';
+        } else {
+          document.getElementById('cyber-top-ips').innerHTML = '<div style="color:var(--text-muted);padding:20px;text-align:center;">لا توجد هجمات في آخر 24 ساعة</div>';
+        }
+
+        // Last update
+        document.getElementById('cyber-last-update').textContent = 'آخر تحديث: ' + new Date().toLocaleTimeString('ar');
+      } catch (e) {
+        console.error('Cyber dashboard error:', e);
+      }
+    }
+
+    function cyberStat(label, value, color) {
+      return '<div class="cyber-stat"><div class="val" style="color:' + color + ';">' + value + '</div><div class="lbl">' + label + '</div></div>';
+    }
+
+    function cyberBar(items, total) {
+      if (total === 0) return '<div style="color:var(--text-muted);font-size:12px;padding:10px;">لا توجد بيانات</div>';
+      let html = '<div class="cyber-bar">';
+      for (const item of items) {
+        if (item.val > 0) {
+          const pct = Math.max((item.val / total * 100), 3);
+          html += '<div style="width:' + pct + '%;background:' + item.color + ';" title="' + item.label + ': ' + item.val + '">' + item.val + '</div>';
+        }
+      }
+      html += '</div>';
+      html += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">';
+      for (const item of items) {
+        html += '<span style="font-size:10px;color:var(--text-muted);"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:' + item.color + ';margin-left:3px;"></span>' + item.label + '</span>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function renderPacketChart(pktStats) {
+      const i = pktStats.input, o = pktStats.output;
+      const totalIO = i.total + o.total;
+      if (totalIO === 0) {
+        document.getElementById('cyber-pkt-chart').innerHTML = '<div style="color:var(--text-muted);padding:20px;text-align:center;">لا توجد بيانات</div>';
+        return;
+      }
+      document.getElementById('cyber-pkt-chart').innerHTML =
+        '<div style="margin-bottom:10px;"><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">INPUT (إدخال)</div>' +
+        cyberBar([
+          { val: i.accepted, label: 'مقبول', color: '#10b981' },
+          { val: i.dropped, label: 'مرفوض', color: '#ef4444' },
+          { val: i.rejected, label: 'مرفوض+', color: '#f59e0b' }
+        ], i.total) + '</div>' +
+        '<div><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">OUTPUT (إخراج)</div>' +
+        cyberBar([
+          { val: o.accepted, label: 'مقبول', color: '#10b981' },
+          { val: o.dropped, label: 'مرفوض', color: '#ef4444' },
+          { val: o.rejected, label: 'مرفوض+', color: '#f59e0b' }
+        ], o.total) + '</div>';
+    }
+
+    function renderHourlyChart(hourlyAttacks) {
+      if (!hourlyAttacks || hourlyAttacks.length === 0) {
+        document.getElementById('cyber-hourly-chart').innerHTML = '<div style="color:var(--text-muted);padding:20px;text-align:center;">لا توجد هجمات</div>';
+        return;
+      }
+      const maxH = Math.max(...hourlyAttacks.map(h => h.count));
+      document.getElementById('cyber-hourly-chart').innerHTML = hourlyAttacks.map(h =>
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><span style="width:35px;font-size:10px;color:var(--text-muted);text-align:right;">' + h.hour + ':00</span><div style="flex:1;background:rgba(99,102,241,0.15);border-radius:4px;height:14px;overflow:hidden;"><div style="width:' + (h.count/maxH*100) + '%;height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:4px;"></div></div><span style="font-size:10px;color:var(--text-muted);width:30px;text-align:right;">' + h.count + '</span></div>'
+      ).join('');
+    }
+
+    // ===== RULES =====
+    async function loadRules() {
+      try {
+        const data = await apiRequest('/api/admin/cybersecurity/rules');
+
+        // iptables
+        if (data.iptables.length > 0) {
+          document.getElementById('iptables-table').innerHTML = data.iptables.map(r =>
+            '<tr><td>' + r.num + '</td><td><span class="badge badge-' + (r.isPolicy ? 'info' : 'primary') + '">' + r.chain + '</span></td><td><span class="badge badge-' + (r.target === 'DROP' || r.target === 'REJECT' ? 'error' : r.target === 'ACCEPT' ? 'success' : 'warning') + '">' + r.target + '</span></td><td>' + r.prot + '</td><td style="font-size:11px;"><code>' + r.source + '</code></td><td style="font-size:11px;"><code>' + r.destination + '</code></td><td>' + r.packets + '</td></tr>'
+          ).join('');
+        } else {
+          document.getElementById('iptables-table').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:20px;">لا يمكن قراءة القواعد (تحتاج صلاحيات root)</td></tr>';
+        }
+
+        // UFW
+        // UFW
+        let ufwHTML = '<span class="badge badge-' + (data.ufw.active ? 'success' : 'error') + '">' + (data.ufw.active ? 'مفعّل' : 'معطّل') + '</span>';
+        if (!data.ufw.active) {
+          ufwHTML += ' <span style="font-size:12px;color:var(--text-muted);margin-right:8px;">' + (data.ufw.raw || '') + '</span>';
+          ufwHTML += ' <button onclick="installUFW()" style="margin-right:8px;padding:4px 12px;border-radius:6px;background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;cursor:pointer;font-size:12px;font-weight:600;">تثبيت وتفعيل UFW</button>';
+        }
+        document.getElementById('ufw-status').innerHTML = ufwHTML;
+        if (data.ufw.rules.length > 0) {
+          document.getElementById('ufw-table').innerHTML = data.ufw.rules.map(r =>
+            '<tr><td>' + r.num + '</td><td>' + r.port + '</td><td><span class="badge badge-' + (r.action === 'ALLOW' ? 'success' : r.action === 'DENY' ? 'error' : 'warning') + '">' + r.action + '</span></td><td>' + r.direction + '</td><td>' + r.from + '</td></tr>'
+          ).join('');
+        } else {
+          document.getElementById('ufw-table').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">' + (data.ufw.active ? 'لا توجد قواعد' : 'UFW غير مفعّل') + '</td></tr>';
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    // ===== CONNECTIONS =====
+    let allConnections = [];
+    async function loadConnections() {
+      try {
+        const data = await apiRequest('/api/admin/cybersecurity/connections');
+        allConnections = data.connections || [];
+        renderConnections(allConnections.slice(0, 200));
+      } catch (e) { console.error(e); }
+    }
+    function filterConnections() {
+      const q = (document.getElementById('conn-filter').value || '').toLowerCase();
+      renderConnections(allConnections.filter(c => !q || c.localAddress.toLowerCase().includes(q) || c.remoteAddress.toLowerCase().includes(q) || c.state.toLowerCase().includes(q)).slice(0, 200));
+    }
+    function renderConnections(conns) {
+      document.getElementById('connections-table').innerHTML = conns.map(c =>
+        '<tr><td>' + c.protocol + '</td><td><span class="badge badge-' + (c.state === 'ESTAB' ? 'success' : c.state === 'LISTEN' ? 'info' : 'warning') + '">' + c.state + '</span></td><td style="font-size:11px;"><code>' + c.localAddress + '</code></td><td style="font-size:11px;"><code>' + c.remoteAddress + '</code></td><td style="font-size:11px;">' + (c.process || '-') + '</td></tr>'
+      ).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">لا توجد اتصالات</td></tr>';
+    }
+
+    // ===== THREATS =====
+    async function loadThreats() {
+      try {
+        const data = await apiRequest('/api/admin/cybersecurity/threats');
+        const a = data.analysis;
+
+        // High
+        document.getElementById('threat-high').innerHTML = a.high.length > 0 ?
+          a.high.slice(0, 5).map(t => '<div style="padding:6px;border-bottom:1px solid rgba(239,68,68,0.1);font-size:12px;"><code>' + t.ip_address + '</code> - ' + (t.reason || t.threat_type || '') + '</div>').join('') :
+          '<div style="color:var(--text-muted);font-size:12px;padding:10px;">لا توجد تهديدات عالية</div>';
+
+        // Medium
+        document.getElementById('threat-medium').innerHTML = a.medium.length > 0 ?
+          a.medium.slice(0, 5).map(t => '<div style="padding:6px;border-bottom:1px solid rgba(245,158,11,0.1);font-size:12px;"><code>' + t.ip_address + '</code> - ' + (t.threat_type || '') + ' (درجة: ' + (t.score || 0) + ')</div>').join('') :
+          '<div style="color:var(--text-muted);font-size:12px;padding:10px;">لا توجد تهديدات متوسطة</div>';
+
+        // Low
+        document.getElementById('threat-low').innerHTML = a.low.length > 0 ?
+          a.low.slice(0, 5).map(t => '<div style="padding:6px;border-bottom:1px solid rgba(59,130,246,0.1);font-size:12px;"><code>' + t.ip_address + '</code> - ' + t.count + ' محاولة فاشلة</div>').join('') :
+          '<div style="color:var(--text-muted);font-size:12px;padding:10px;">لا توجد تهديدات منخفضة</div>';
+
+        // Suspicious networks
+        if (data.suspicious.length > 0) {
+          document.getElementById('suspicious-networks').innerHTML = data.suspicious.map(s =>
+            '<div class="cyber-alert ' + s.severity + '">' + (s.severity === 'high' ? '' : '⚠️') + ' ' + s.description + '</div>'
+          ).join('');
+        } else {
+          document.getElementById('suspicious-networks').innerHTML = '<div style="color:var(--text-muted);padding:20px;text-align:center;">لا توجد شبكات مشبوهة</div>';
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    // ===== WAF LOGS =====
+    async function loadWAFLogs(page) {
+      try {
+        const ip = document.getElementById('waf-ip-filter')?.value || '';
+        const type = document.getElementById('waf-type-filter')?.value || '';
+        const data = await apiRequest('/api/admin/cybersecurity/waf-logs?page=' + page + '&ip=' + encodeURIComponent(ip) + '&type=' + encodeURIComponent(type));
+
+        // Populate type filter
+        if (data.types && page === 1) {
+          const sel = document.getElementById('waf-type-filter');
+          const cur = sel.value;
+          sel.innerHTML = '<option value="">كل الأنواع</option>' + data.types.map(t => '<option value="' + t + '"' + (t === cur ? ' selected' : '') + '>' + t + '</option>').join('');
+        }
+
+        document.getElementById('waf-logs-body').innerHTML = data.logs.map(l =>
+          '<tr><td style="font-size:11px;">' + formatDate(l.created_at) + '</td><td><code style="font-size:11px;">' + l.ip_address + '</code></td><td><span class="badge badge-' + (l.blocked ? 'error' : 'warning') + '">' + l.threat_type + '</span></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;">' + (l.url || '-') + '</td><td><span class="badge ' + (l.score >= 50 ? 'badge-error' : l.score >= 20 ? 'badge-warning' : 'badge-info') + '">' + (l.score || 0) + '</span></td><td>' + (l.blocked ? 'محظور' : 'مرصد') + '</td></tr>'
+        ).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">لا توجد سجلات</td></tr>';
+
+        // Pagination
+        if (data.pages > 1) {
+          let phtml = '';
+          for (let i = 1; i <= Math.min(data.pages, 10); i++) {
+            phtml += '<button onclick="loadWAFLogs(' + i + ')" style="margin:2px;padding:4px 10px;border-radius:4px;border:1px solid var(--color-border,#444);background:' + (i === data.page ? 'var(--color-primary,#6366f1)' : 'transparent') + ';color:' + (i === data.page ? 'white' : 'var(--text-primary)') + ';cursor:pointer;font-size:11px;">' + i + '</button>';
+          }
+          document.getElementById('waf-pagination').innerHTML = phtml;
+        } else {
+          document.getElementById('waf-pagination').innerHTML = '';
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    // ===== BLOCKED IPS =====
+    async function loadBlockedIPs() {
+      try {
+        const data = await apiRequest('/api/admin/cybersecurity/blocked-ips');
+        document.getElementById('blocked-body').innerHTML = data.ips.map(ip =>
+          '<tr><td><code>' + ip.ip_address + '</code></td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;">' + (ip.reason || '-') + '</td><td style="font-size:11px;">' + formatDate(ip.blocked_at) + '</td><td style="font-size:11px;">' + (ip.permanent ? 'دائم' : (ip.expires_at ? formatDate(ip.expires_at) : '-')) + '</td><td>' + (ip.permanent ? '<span class="badge badge-error">دائم</span>' : '<span class="badge badge-warning">مؤقت</span>') + '</td><td><button class="action-btn danger" onclick="unblockIP(\'' + ip.ip_address + '\')">إلغاء</button></td></tr>'
+        ).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">لا توجد عناوين محظورة</td></tr>';
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadLoginHistory(page) {
+      try {
+        const success = document.getElementById('login-status-filter')?.value || '';
+        const data = await apiRequest('/api/admin/cybersecurity/login-history?page=' + page + '&success=' + success);
+        document.getElementById('logins-body').innerHTML = data.logs.map(l =>
+          '<tr><td style="font-size:11px;">' + formatDate(l.created_at) + '</td><td>' + l.email + '</td><td><code style="font-size:11px;">' + (l.ip_address || '-') + '</code></td><td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;">' + (l.user_agent || '-') + '</td><td>' + (l.success ? '<span class="badge badge-success">ناجح</span>' : '<span class="badge badge-error">فاشل</span>') + '</td></tr>'
+        ).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">لا توجد سجلات</td></tr>';
+        renderPagination('logins-pagination', data.page, data.pages, 'loadLoginHistory');
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadSecurityEvents(page) {
+      try {
+        const action = document.getElementById('event-type-filter')?.value || '';
+        const data = await apiRequest('/api/admin/cybersecurity/events?page=' + page + '&action=' + encodeURIComponent(action));
+        if (data.types && page === 1) {
+          const sel = document.getElementById('event-type-filter');
+          const cur = sel.value;
+          sel.innerHTML = '<option value="">الكل</option>' + data.types.map(t => '<option value="' + t + '"' + (t === cur ? ' selected' : '') + '>' + t + '</option>').join('');
+        }
+        document.getElementById('events-body').innerHTML = data.events.map(e =>
+          '<tr><td style="font-size:11px;">' + formatDate(e.created_at) + '</td><td><span class="badge badge-warning">' + e.action + '</span></td><td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;">' + (e.details || '-') + '</td><td><code style="font-size:11px;">' + (e.ip_address || '-') + '</code></td></tr>'
+        ).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px;">لا توجد أحداث</td></tr>';
+        renderPagination('events-pagination', data.page, data.pages, 'loadSecurityEvents');
+      } catch (e) { console.error(e); }
+    }
+
+    function renderPagination(containerId, page, pages, fnName) {
+      if (pages <= 1) { document.getElementById(containerId).innerHTML = ''; return; }
+      let html = '';
+      for (let i = 1; i <= Math.min(pages, 10); i++) {
+        html += '<button onclick="' + fnName + '(' + i + ')" style="margin:2px;padding:4px 10px;border-radius:4px;border:1px solid var(--color-border,#444);background:' + (i === page ? 'var(--color-primary,#6366f1)' : 'transparent') + ';color:' + (i === page ? 'white' : 'var(--text-primary)') + ';cursor:pointer;font-size:11px;">' + i + '</button>';
+      }
+      document.getElementById(containerId).innerHTML = html;
+    }
+
+    // ===== ACTIONS =====
+    async function quickBlock(ip) {
+      if (!confirm('حظر ' + ip + '؟')) return;
+      try {
+        await apiRequest('/api/admin/cybersecurity/block-ip', { method: 'POST', body: JSON.stringify({ ip, reason: 'From attackers list', permanent: false }) });
+        showNotification('تم الحظر', 'success');
+        loadCyberDashboard();
+      } catch (e) { showNotification('خطأ', 'error'); }
+    }
+    function showBlockModal() {
+      const ip = prompt('عنوان IP:');
+      if (!ip) return;
+      const reason = prompt('السبب:') || 'Manual';
+      const perm = confirm('حظر دائم؟');
+      apiRequest('/api/admin/cybersecurity/block-ip', { method: 'POST', body: JSON.stringify({ ip, reason, permanent: perm }) })
+        .then(() => { showNotification('تم', 'success'); loadBlockedIPs(); })
+        .catch(() => showNotification('خطأ', 'error'));
+    }
+    async function unblockIP(ip) {
+      if (!confirm('إلغاء حظر ' + ip + '؟')) return;
+      try {
+        await apiRequest('/api/admin/cybersecurity/unblock-ip/' + encodeURIComponent(ip), { method: 'DELETE' });
+        showNotification('تم', 'success');
+        loadBlockedIPs();
+      } catch (e) { showNotification('خطأ', 'error'); }
+    }
+    async function unblockAll() {
+      if (!confirm('إلغاء جميع الحجوزات المؤقتة؟')) return;
+      try {
+        await apiRequest('/api/admin/cybersecurity/unblock-all', { method: 'POST' });
+        showNotification('تم', 'success');
+        loadBlockedIPs();
+      } catch (e) { showNotification('خطأ', 'error'); }
+    }
+
+    async function installUFW() {
+      if (!confirm('سيتم تثبيت وتفعيل UFW وإضافة قواعد الحماية.\nالمنافذ المسموحة: 22 (SSH), 80 (HTTP), 443 (HTTPS)\n\nمتابعة؟')) return;
+      try {
+        const result = await apiRequest('/api/admin/cybersecurity/install-ufw', { method: 'POST' });
+        showNotification(result.message || 'تم التثبيت', 'success');
+        loadRules();
+      } catch (e) {
+        showNotification('خطأ: تأكد من تشغيل السيرفر بصلاحيات root', 'error');
+      }
+    }
+
+    async function deleteAdminNotificationById(id) {
+      try {
+        await apiRequest('/api/admin/notifications/' + id, { method: 'DELETE' });
+        loadAdminNotifications();
+        showNotification('تم حذف الإشعار', 'success');
+      } catch (error) { showNotification('خطأ في الحذف', 'error'); }
+    }
+
+    async function markAllAdminNotificationsRead() {
+      try {
+        await apiRequest('/api/notifications/read-all', { method: 'PUT' });
+        loadAdminNotifications();
+        showNotification('تم تحديد الكل كمقروء', 'success');
+      } catch (error) { showNotification('خطأ', 'error'); }
+    }
+
+    async function deleteAllAdminNotifications() {
+      if (!confirm('هل أنت متأكد من حذف جميع الإشعارات؟')) return;
+      try {
+        await apiRequest('/api/admin/notifications', { method: 'DELETE' });
+        loadAdminNotifications();
+        showNotification('تم حذف جميع الإشعارات', 'success');
+      } catch (error) { showNotification('خطأ في الحذف', 'error'); }
+    }
+
+    function openCouponModal(coupon = null) {
+      const modal = document.getElementById('coupon-modal');
+      document.getElementById('coupon-form').reset();
+      document.getElementById('coupon-id').value = '';
+      if (coupon) {
+        document.getElementById('coupon-modal-title').textContent = 'تعديل كود خصم';
+        document.getElementById('coupon-id').value = coupon.id;
+        document.getElementById('coupon-code').value = coupon.code;
+        document.getElementById('coupon-discount-type').value = coupon.discount_type;
+        document.getElementById('coupon-discount-value').value = coupon.discount_value;
+        document.getElementById('coupon-active').checked = coupon.is_active === 1;
+      }
+      modal.classList.add('active');
+    }
+
+    async function editCoupon(id) { try { const coupons = await apiRequest('/api/payment/admin/coupons'); const coupon = coupons.find(c => c.id === id); if (coupon) openCouponModal(coupon); } catch (error) { showNotification('خطأ في جلب البيانات', 'error'); } }
+    async function deleteCoupon(id) { try { await apiRequest('/api/payment/admin/coupons/' + id, { method: 'DELETE' }); loadCoupons(); showNotification('تم الحذف', 'success'); } catch (error) { showNotification('خطأ في الحذف', 'error'); } }
+
+    document.getElementById('coupon-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('coupon-id').value;
+      const couponData = { code: document.getElementById('coupon-code').value.toUpperCase(), description: document.getElementById('coupon-description').value, discountType: document.getElementById('coupon-discount-type').value, discountValue: parseFloat(document.getElementById('coupon-discount-value').value), isActive: document.getElementById('coupon-active').checked };
+      try { 
+        if (id) { await apiRequest('/api/payment/admin/coupons/' + id, { method: 'PUT', body: JSON.stringify(couponData) }); showNotification('تم التحديث', 'success'); } 
+        else { await apiRequest('/api/payment/admin/coupons', { method: 'POST', body: JSON.stringify(couponData) }); showNotification('تم الإنشاء', 'success'); } 
+        closeModal('coupon-modal'); loadCoupons(); 
+      } catch (error) { showNotification(error.message || 'خطأ', 'error'); } 
+    });
+
+    document.getElementById('product-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const id = document.getElementById('product-id').value;
+      const fileInput = document.getElementById('product-file');
+      const file = fileInput.files[0];
+      
+      const data = {
+        name: document.getElementById('product-name').value,
+        name_ar: document.getElementById('product-name-ar').value,
+        description: document.getElementById('product-desc').value,
+        description_ar: document.getElementById('product-desc').value,
+        price: parseFloat(document.getElementById('product-price').value),
+        is_free: document.getElementById('product-type').value === 'free',
+        is_paid: document.getElementById('product-type').value === 'paid',
+        version: document.getElementById('product-version').value || '1.0.0',
+        category: document.getElementById('product-category').value || 'general'
+      };
+      
+      try {
+        if (file) {
+          // Show progress
+          document.getElementById('upload-progress').style.display = 'block';
+          const progressBar = document.getElementById('progress-bar');
+          const uploadStatus = document.getElementById('upload-status');
+          
+          // Use FormData for file upload
+          const formData = new FormData();
+          Object.keys(data).forEach(key => formData.append(key, data[key]));
+          formData.append('file', file);
+          
+          // Create XMLHttpRequest for progress tracking
+          const xhr = new XMLHttpRequest();
+          
+          xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+              const percent = (e.loaded / e.total) * 100;
+              progressBar.style.width = percent + '%';
+              const mbLoaded = (e.loaded / (1024 * 1024)).toFixed(2);
+              const mbTotal = (e.total / (1024 * 1024)).toFixed(2);
+              uploadStatus.textContent = `جاري الرفع: ${mbLoaded} MB / ${mbTotal} MB (${percent.toFixed(1)}%)`;
+            }
+          });
+          
+          xhr.addEventListener('load', () => {
+            if (xhr.status === 200) {
+              const result = JSON.parse(xhr.responseText);
+              showNotification(result.message || 'تم الحفظ بنجاح', 'success');
+              closeModal('product-modal');
+              loadProducts();
+              document.getElementById('upload-progress').style.display = 'none';
+            } else if (xhr.status === 401 || xhr.status === 403) {
+              showNotification('انتهت الجلسة، يرجى تسجيل الدخول novamente', 'error');
+              window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+            } else {
+              try {
+                const result = JSON.parse(xhr.responseText);
+                showNotification(result.error || 'خطأ في الرفع: ' + xhr.statusText, 'error');
+              } catch(e) {
+                showNotification('خطأ في الرفع: ' + xhr.statusText, 'error');
+              }
+              document.getElementById('upload-progress').style.display = 'none';
+            }
+          });
+          
+          xhr.addEventListener('error', () => {
+            showNotification('خطأ في الاتصال بالخادم', 'error');
+            document.getElementById('upload-progress').style.display = 'none';
+          });
+          
+          xhr.addEventListener('timeout', () => {
+            showNotification('انتهت مهلة الرفع - الملف كبير جداً أو الاتصال بطيء', 'error');
+            document.getElementById('upload-progress').style.display = 'none';
+          });
+          
+          // Get auth token
+          const cookieToken = document.cookie.split('; ').find(row => row.startsWith('client_token='))?.split('=')[1];
+
+          xhr.open('POST', '/api/products/upload');
+          xhr.timeout = 1800000; // 30 minutes timeout for large files
+          if (cookieToken) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + cookieToken);
+          }
+          xhr.withCredentials = true;
+          xhr.send(formData);
+          
+          return;
+        }
+        
+        // No file, use regular API
+        if (id) {
+          await apiRequest('/api/products/' + id, { method: 'PUT', body: JSON.stringify(data) });
+        } else {
+          await apiRequest('/api/products', { method: 'POST', body: JSON.stringify(data) });
+        }
+        closeModal('product-modal');
+        loadProducts();
+        showNotification('تم الحفظ', 'success');
+      } catch (error) {
+        showNotification(error.message, 'error');
+      }
+    });
+
+    document.getElementById('service-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('service-id').value;
+      const data = { name: document.getElementById('service-name').value, name_ar: document.getElementById('service-name-ar').value, description: document.getElementById('service-desc').value, description_ar: document.getElementById('service-desc').value };
+      try { if (id) await apiRequest('/api/admin/services/' + id, { method: 'PUT', body: JSON.stringify(data) }); else await apiRequest('/api/admin/services', { method: 'POST', body: JSON.stringify(data) }); closeModal('service-modal'); loadServices(); showNotification('تم الحفظ', 'success'); } catch (error) { showNotification(error.message, 'error'); } 
+    });
+
+    async function deleteUser(id) { try { await apiRequest('/api/admin/users/' + id, { method: 'DELETE' }); loadUsers(); showNotification('تم الحذف', 'success'); } catch (error) { showNotification(error.message, 'error'); } }
+    async function deleteProduct(id) { try { await apiRequest('/api/products/' + id, { method: 'DELETE' }); loadProducts(); showNotification('تم الحذف', 'success'); } catch (error) { showNotification(error.message, 'error'); } }
+    async function deleteService(id) { try { await apiRequest('/api/admin/services/' + id, { method: 'DELETE' }); loadServices(); showNotification('تم الحذف', 'success'); } catch (error) { showNotification(error.message, 'error'); } }
+    async function deleteMessage(id) { try { await apiRequest('/api/admin/messages/' + id, { method: 'DELETE' }); loadMessages(); showNotification('تم الحذف', 'success'); } catch (error) { showNotification(error.message, 'error'); } }
+
+    async function loadAnalytics() {
+      try {
+        document.getElementById('analytics-revenue').textContent = '...';
+        document.getElementById('analytics-orders').textContent = '...';
+        document.getElementById('analytics-avg-order').textContent = '...';
+        document.getElementById('analytics-new-users').textContent = '...';
+        
+        const data = await apiRequest('/api/admin/analytics');
+        
+        document.getElementById('analytics-revenue').textContent = '$' + (data.revenue || 0).toLocaleString();
+        document.getElementById('analytics-orders').textContent = (data.totalOrders || 0).toLocaleString();
+        document.getElementById('analytics-avg-order').textContent = data.totalOrders > 0 ? '$' + (data.revenue / data.totalOrders).toFixed(2) : '$0';
+        document.getElementById('analytics-new-users').textContent = (data.newUsers || 0).toLocaleString();
+        document.getElementById('analytics-revenue-change').textContent = data.totalOrders > 0 ? '+' + Math.round((data.revenue / 100)) + '%' : '+0%';
+        document.getElementById('analytics-orders-change').textContent = data.totalOrders > 0 ? '+0%' : '+0%';
+        document.getElementById('analytics-users-change').textContent = '+' + (data.newUsers || 0) + '%';
+        
+        const topProductsEl = document.getElementById('top-products');
+        if (data.topProducts && data.topProducts.length > 0) {
+          topProductsEl.innerHTML = data.topProducts.map(p => '<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);"><span>' + (p.name_ar || p.name || '-') + '</span><span class="badge badge-primary">' + (p.order_count || 0) + ' مبيعات</span></div>').join('');
+        } else { topProductsEl.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">لا توجد بيانات</div>'; }
+      } catch (error) { 
+        console.error('Error loading analytics:', error);
+        document.getElementById('analytics-revenue').textContent = '$0';
+        document.getElementById('analytics-orders').textContent = '0';
+        document.getElementById('analytics-avg-order').textContent = '$0';
+        document.getElementById('analytics-new-users').textContent = '0';
+      }
+    }
+    
+    async function loadSystemHealth() {
+      try {
+        const data = await apiRequest('/api/admin/system-health');
+        document.getElementById('server-uptime').textContent = formatUptime(data.uptime);
+        document.getElementById('server-memory').textContent = (data.memory?.used || 0) + ' MB';
+        document.getElementById('db-size').textContent = data.database?.size || '0 MB';
+        document.getElementById('node-version').textContent = data.nodeVersion || '-';
+        const serverStatus = document.getElementById('server-status');
+        const telegramStatus = document.getElementById('telegram-status');
+        serverStatus.textContent = 'Online';
+        if (serverStatus.parentElement) {
+          const indicator = serverStatus.parentElement.querySelector('.status-indicator');
+          if (indicator) indicator.style.background = '#10b981';
+        }
+        if (data.telegram?.connected) { 
+          telegramStatus.style.background = '#10b981'; 
+          telegramStatus.nextElementSibling.textContent = 'متصل'; 
+        }
+        else { 
+          telegramStatus.style.background = '#ef4444'; 
+          telegramStatus.nextElementSibling.textContent = 'غير متصل'; 
+        }
+      } catch (error) { console.error('Error loading system health:', error); }
+    }
+    
+    function formatUptime(seconds) { 
+      const hours = Math.floor(seconds / 3600); 
+      const minutes = Math.floor((seconds % 3600) / 60); 
+      return hours + ' ساعة ' + minutes + ' دقيقة'; 
+    }
+    
+    async function loadErrorLogs() {
+      try {
+        const data = await apiRequest('/api/admin/error-logs');
+        const tbody = document.getElementById('error-logs-table');
+        if (data.logs && data.logs.length > 0) { 
+          tbody.innerHTML = data.logs.map(log => '<tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 14px; color: var(--text-primary);">' + (log.action || log.event_type || 'Server Error') + '</td><td style="padding: 14px; color: var(--text-secondary);">' + formatDate(log.created_at) + '</td><td style="padding: 14px;"><span class="badge badge-error" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 4px 10px; border-radius: 6px; font-size: 12px;">' + (log.source === 'security' ? 'أمان' : log.source === 'server' ? 'خادم' : 'نشاط') + '</span></td><td style="padding: 14px;"><button class="btn btn-sm" style="background: rgba(99, 102, 241, 0.2); color: #6366f1; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;" onclick="alert(\'' + (log.details || log.description || 'لا توجد تفاصيل') + '\')">عرض</button></td></tr>').join(''); 
+        }
+        else { tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-muted);"><div style="font-size: 48px; margin-bottom: 12px;">✅</div>لا توجد أخطاء</td></tr>'; }
+      } catch (error) { console.error('Error loading error logs:', error); }
+    }
+
+    // Auto-refresh error logs every 5 seconds
+    setInterval(loadErrorLogs, 5000);
+    
+    window.loadBroadcasts = async function() {
+      try {
+        const data = await apiRequest('/api/admin/broadcasts');
+        const tbody = document.getElementById('broadcasts-table');
+        if (data.broadcasts && data.broadcasts.length > 0) { 
+          tbody.innerHTML = data.broadcasts.map(b => '<tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 14px; color: var(--text-primary); font-weight: 500;">' + b.title + '</td><td style="padding: 14px;"><span class="badge" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6; padding: 4px 10px; border-radius: 6px; font-size: 12px;">' + (b.target_type === 'all' ? 'الكل' : b.target_type === 'admins' ? 'المديرين' : b.target_type) + '</span></td><td style="padding: 14px;"><span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 4px 10px; border-radius: 6px; font-size: 12px;">مُرسل</span></td><td style="padding: 14px; color: var(--text-secondary);">' + formatDate(b.created_at) + '</td><td style="padding: 14px;"><button class="action-btn danger" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;" onclick="deleteBroadcast(' + b.id + ')">🗑️</button></td></tr>').join(''); 
+        }
+        else { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);"><div style="font-size: 48px; margin-bottom: 12px;">📭</div>لا توجد رسائل بث<br><button class="btn" style="margin-top: 16px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;" onclick="showBroadcastModal()">إنشاء أول بث</button></td></tr>'; }
+      } catch (error) { console.error('Error loading broadcasts:', error); }
+    }
+    
+    window.deleteBroadcast = async function(id) { try { await apiRequest('/api/admin/broadcasts/' + id, { method: 'DELETE' }); loadBroadcasts(); showNotification('تم الحذف بنجاح', 'success'); } catch (error) { showNotification(error.message || 'خطأ في الحذف', 'error'); } }
+    
+    window.loadAutoResponses = async function() {
+      try {
+        const data = await apiRequest('/api/admin/auto-responses');
+        const tbody = document.getElementById('auto-responses-table');
+        if (data.responses && data.responses.length > 0) { 
+          tbody.innerHTML = data.responses.map(r => '<tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 14px;"><code style="background: rgba(99, 102, 241, 0.2); color: #6366f1; padding: 4px 8px; border-radius: 4px; font-family: monospace;">' + r.keyword + '</code></td><td style="padding: 14px; color: var(--text-secondary); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + (r.response || '').substring(0, 50) + ((r.response || '').length > 50 ? '...' : '') + '</td><td style="padding: 14px;"><span class="badge" style="background: rgba(' + (r.is_active ? '16, 185, 129' : '239, 68, 68') + ', 0.2); color: ' + (r.is_active ? '#10b981' : '#ef4444') + '; padding: 4px 10px; border-radius: 6px; font-size: 12px;">' + (r.is_active ? 'مفعّل' : 'معطّل') + '</span></td><td style="padding: 14px; color: var(--text-primary);">' + (r.priority || 0) + '</td><td style="padding: 14px;"><button class="action-btn danger" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;" onclick="deleteAutoResponse(' + r.id + ')">🗑️</button></td></tr>').join(''); 
+        }
+        else { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);"><div style="font-size: 48px; margin-bottom: 12px;">🤖</div>لا توجد ردود تلقائية<br><button class="btn" style="margin-top: 16px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;" onclick="showAutoResponseModal()">إنشاء أول رد تلقائي</button></td></tr>'; }
+      } catch (error) { console.error('Error loading auto responses:', error); }
+    }
+    
+    window.deleteAutoResponse = async function(id) { try { await apiRequest('/api/admin/auto-responses/' + id, { method: 'DELETE' }); loadAutoResponses(); showNotification('تم الحذف بنجاح', 'success'); } catch (error) { showNotification(error.message || 'خطأ في الحذف', 'error'); } }
+    
+    window.showAutoResponseModal = function(response = null) {
+      console.log('showAutoResponseModal called', response);
+      try {
+        // Remove any existing modals first
+        const existingModal = document.getElementById('auto-response-modal');
+        if (existingModal) existingModal.remove();
+        
+        const isEdit = !!response;
+        const modal = document.createElement('div');
+        modal.id = 'auto-response-modal';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+        
+        const keyword = response?.keyword || '';
+        const responseText = response?.response || '';
+        const priority = response?.priority || 0;
+        const isActive = response?.is_active !== 0;
+        
+        modal.innerHTML = `
+          <div style="background: linear-gradient(145deg, #1a1a22, #141419); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; width: 90%; max-width: 500px; max-height: 90vh; overflow: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <h3 style="margin: 0; color: #fff; font-size: 18px;">🤖 ${isEdit ? 'تعديل رد تلقائي' : 'إضافة رد تلقائي'}</h3>
+              <button onclick="document.getElementById('auto-response-modal').remove()" style="background: none; border: none; color: #71717a; font-size: 24px; cursor: pointer;">✕</button>
+            </div>
+            <form id="auto-response-form">
+              <input type="hidden" id="auto-response-id" value="${response?.id || ''}">
+              <div style="padding: 24px;">
+                <div style="margin-bottom: 16px;">
+                  <label style="display: block; margin-bottom: 8px; color: #a1a1aa; font-size: 14px;">الكلمة المفتاحية</label>
+                  <input type="text" id="auto-response-keyword" value="${keyword}" required style="width: 100%; padding: 12px 16px; background: #0f0f14; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                  <label style="display: block; margin-bottom: 8px; color: #a1a1aa; font-size: 14px;">الرد التلقائي</label>
+                  <textarea id="auto-response-text" required rows="4" style="width: 100%; padding: 12px 16px; background: #0f0f14; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box; resize: vertical;">${responseText}</textarea>
+                </div>
+                <div style="margin-bottom: 16px;">
+                  <label style="display: block; margin-bottom: 8px; color: #a1a1aa; font-size: 14px;">الأولوية</label>
+                  <input type="number" id="auto-response-priority" value="${priority}" min="0" style="width: 100%; padding: 12px 16px; background: #0f0f14; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #a1a1aa;">
+                    <input type="checkbox" id="auto-response-active" ${isActive ? 'checked' : ''} style="width: 18px; height: 18px;">
+                    <span>مفعّل</span>
+                  </label>
+                </div>
+              </div>
+              <div style="padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: flex-end; gap: 12px;">
+                <button type="button" onclick="document.getElementById('auto-response-modal').remove()" style="padding: 10px 20px; background: rgba(255,255,255,0.1); border: none; border-radius: 8px; color: #a1a1aa; cursor: pointer;">إلغاء</button>
+                <button type="submit" style="padding: 10px 24px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">حفظ</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        console.log('Auto response modal created');
+        
+        document.getElementById('auto-response-form').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const id = document.getElementById('auto-response-id').value;
+          const data = { 
+            keyword: document.getElementById('auto-response-keyword').value, 
+            response: document.getElementById('auto-response-text').value, 
+            priority: parseInt(document.getElementById('auto-response-priority').value) || 0, 
+            is_active: document.getElementById('auto-response-active').checked 
+          };
+          
+          try { 
+            if (id) { 
+              await apiRequest('/api/admin/auto-responses/' + id, { method: 'PUT', body: JSON.stringify(data) }); 
+            } else { 
+              await apiRequest('/api/admin/auto-responses', { method: 'POST', body: JSON.stringify(data) }); 
+            } 
+            document.getElementById('auto-response-modal').remove();
+            if (typeof loadAutoResponses === 'function') loadAutoResponses();
+            showNotification('تم الحفظ بنجاح', 'success'); 
+          } catch (error) { 
+            showNotification(error.message || 'خطأ', 'error'); 
+          }
+        });
+      } catch (e) {
+        console.error('Error creating auto response modal:', e);
+        alert('Error: ' + e.message);
+      }
+    };
+    
+    window.closeAutoResponseModal = function() {
+      const modal = document.getElementById('auto-response-modal');
+      if (modal) modal.remove();
+    };
+    
+    function toggleUserMenu() {
+      const dropdown = document.getElementById('user-dropdown');
+      if (dropdown) dropdown.classList.toggle('show');
+    }
+    
+    document.addEventListener('click', function(e) {
+      const userSection = document.getElementById('user-profile');
+      const dropdown = document.getElementById('user-dropdown');
+      if (userSection && !userSection.contains(e.target)) {
+        dropdown && dropdown.classList.remove('show');
+      }
+      if (e.target.classList.contains('logout-link') || e.target.closest('.logout-link')) {
+        e.preventDefault();
+        logout();
+      }
+    });
+    
+    async function logout() {
+      try {
+        await apiRequest('/api/auth/logout', { method: 'POST' });
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+      // Clear client-side data
+      currentUser = null;
+      sessionStorage.removeItem('currentUser');
+      sessionStorage.removeItem('authToken');
+      document.cookie = 'client_token=; Max-Age=-99999999; path=/';
+      window.location.href = '/login';
+    }
+    
+    function generateAvatarGradient(email) {
+      const hash = email.split('').reduce((acc, char) => {
+        return char.charCodeAt(0) + ((acc << 5) - acc);
+      }, 0);
+      const gradients = [
+        { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', text: '#ffffff' },
+        { gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', text: '#ffffff' },
+        { gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', text: '#ffffff' },
+        { gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', text: '#ffffff' },
+        { gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', text: '#ffffff' },
+        { gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', text: '#ffffff' },
+        { gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', text: '#ffffff' },
+        { gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', text: '#333333' },
+        { gradient: 'linear-gradient(135deg, #ff8a00 0%, #da1b60 100%)', text: '#ffffff' },
+        { gradient: 'linear-gradient(135deg, #8360c3 0%, #2ebf91 100%)', text: '#ffffff' }
+      ];
+      const index = Math.abs(hash) % gradients.length;
+      return gradients[index];
+    }
+    
+    async function loadUserProfile() {
+      try {
+        const response = await apiRequest('/api/auth/me');
+        if (response && response.user) {
+          const user = response.user;
+          document.getElementById('user-profile').style.display = 'block';
+          document.getElementById('admin-info').textContent = 'مرحباً، ' + (user.username || user.email);
+          
+          const nameEl = document.getElementById('admin-name');
+          const avatarEl = document.getElementById('admin-avatar');
+          
+          if (nameEl) nameEl.textContent = user.username || user.email || 'Admin';
+          if (avatarEl) {
+            const initial = (user.email || user.username || 'A')[0].toUpperCase();
+            avatarEl.textContent = initial;
+            const colors = generateAvatarGradient(user.email || user.username || '');
+            avatarEl.style.background = colors.gradient;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user profile:', error);
+      }
+    }
+
+    loadUserProfile();
+    loadDashboard();
+  </script>
+</body>
+</html>

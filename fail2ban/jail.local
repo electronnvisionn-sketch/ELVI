@@ -1,0 +1,104 @@
+# ============================================================
+# ELECTRON VISION - Fail2Ban Configuration
+# Automatic IP Banning on Suspicious Activity
+# ============================================================
+
+[DEFAULT]
+# Ban duration: 1 hour (adjustable)
+bantime  = 3600
+
+# Detection window: 10 minutes
+findtime = 600
+
+# Max retries before ban
+maxretry = 5
+
+# Ban action
+banaction = iptables-multiport
+
+# Ignore localhost
+ignoreip = 127.0.0.1/8 ::1
+
+# ============================================================
+# JAIL: Nginx HTTP Auth (401/403 responses)
+# ============================================================
+[nginx-http-auth]
+enabled  = true
+port     = http,https
+filter   = nginx-http-auth
+logpath  = /var/log/nginx/error.log
+maxretry = 5
+bantime  = 3600
+findtime = 600
+
+# ============================================================
+# JAIL: Nginx Bot/Scanner Detection
+# ============================================================
+[nginx-botsearch]
+enabled  = true
+port     = http,https
+filter   = nginx-botsearch
+logpath  = /var/log/nginx/access.log
+maxretry = 3
+bantime  = 86400
+findtime = 60
+
+# ============================================================
+# JAIL: Nginx 4xx Errors (Suspicious Scanning)
+# ============================================================
+[nginx-badbots]
+enabled  = true
+port     = http,https
+filter   = nginx-badbots
+logpath  = /var/log/nginx/access.log
+maxretry = 10
+bantime  = 7200
+findtime = 300
+
+# ============================================================
+# JAIL: Nginx Rate Limiting (429 responses)
+# ============================================================
+[nginx-limit-req]
+enabled  = true
+port     = http,https
+filter   = nginx-limit-req
+logpath  = /var/log/nginx/error.log
+maxretry = 5
+bantime  = 1800
+findtime = 300
+
+# ============================================================
+# JAIL: SSH Brute Force
+# ============================================================
+[sshd]
+enabled  = true
+port     = ssh
+filter   = sshd
+logpath  = /var/log/auth.log
+maxretry = 3
+bantime  = 86400
+findtime = 600
+
+# ============================================================
+# JAIL: Application-Level 401/403 (from Node.js logs)
+# ============================================================
+[electron-vision-auth]
+enabled  = true
+port     = http,https
+filter   = electron-vision-auth
+logpath  = /var/log/electron-vision/security.log
+maxretry = 5
+bantime  = 3600
+findtime = 600
+
+# ============================================================
+# JAIL: Blocked Path Access
+# ============================================================
+[electron-vision-blocked]
+enabled  = true
+port     = http,https
+filter   = electron-vision-blocked
+logpath  = /var/log/nginx/blocked.log
+maxretry = 3
+bantime  = 86400
+findtime = 60

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>شروط الاستخدام - ELECTRON VISION</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <style>
+    :root {
+      --color-primary: #6366f1;
+      --color-primary-hover: #4f46e5;
+      --color-secondary: #10b981;
+      --color-bg-primary: #0f0f23;
+      --color-bg-secondary: #1a1a2e;
+      --color-bg-tertiary: #16213e;
+      --color-text-primary: #f8fafc;
+      --color-text-secondary: #94a3b8;
+      --color-text-muted: #64748b;
+      --color-border: rgba(255, 255, 255, 0.1);
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-error: #ef4444;
+      --font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+      --spacing-1: 0.25rem;
+      --spacing-2: 0.5rem;
+      --spacing-3: 0.75rem;
+      --spacing-4: 1rem;
+      --spacing-6: 1.5rem;
+      --spacing-8: 2rem;
+      --spacing-12: 3rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-family);
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--color-text-primary);
+      background-color: var(--color-bg-primary);
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--color-bg-secondary); }
+    ::-webkit-scrollbar-thumb { background: var(--color-primary); border-radius: 9999px; }
+    
+    .page-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--spacing-8) var(--spacing-4);
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: var(--spacing-12);
+      padding: var(--spacing-8) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .page-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: var(--spacing-4);
+      background: linear-gradient(135deg, #00d4ff, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .page-header p {
+      color: var(--color-text-secondary);
+      font-size: 1.1rem;
+    }
+    
+    .content-section {
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-8);
+      margin-bottom: var(--spacing-6);
+      border: 1px solid var(--color-border);
+    }
+    
+    .content-section h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-4);
+      color: var(--color-primary);
+    }
+    
+    .content-section p {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-4);
+    }
+    
+    .content-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .content-section ul li {
+      position: relative;
+      padding-right: var(--spacing-6);
+      margin-bottom: var(--spacing-3);
+      color: var(--color-text-secondary);
+    }
+    
+    .content-section ul li::before {
+      content: '✓';
+      position: absolute;
+      right: 0;
+      color: var(--color-success);
+      font-weight: bold;
+    }
+    
+    .content-section ol {
+      padding-right: var(--spacing-6);
+    }
+    
+    .content-section ol li {
+      margin-bottom: var(--spacing-3);
+      color: var(--color-text-secondary);
+    }
+    
+    .highlight-box {
+      background: rgba(99, 102, 241, 0.1);
+      border-right: 4px solid var(--color-primary);
+      padding: var(--spacing-4);
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+      margin: var(--spacing-4) 0;
+    }
+    
+    /* Navbar Styles */
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: var(--color-bg-primary); border-bottom: 1px solid var(--color-border); transition: all 0.3s ease; }
+    .navbar.scrolled { background: rgba(15, 15, 35, 0.95); backdrop-filter: blur(10px); }
+    .navbar .container { max-width: 1400px; margin: 0 auto; padding: 0 var(--spacing-4); }
+    .navbar-container { display: flex; align-items: center; justify-content: space-between; height: 70px; }
+    .navbar-brand { display: flex; align-items: center; gap: var(--spacing-3); text-decoration: none; }
+    .navbar-logo { width: 40px; height: 40px; border-radius: 10px; }
+    .navbar-brand-text { font-size: 1.4rem; font-weight: 700; color: var(--color-primary); }
+    @media (min-width: 993px) {
+      .navbar-nav { display: flex; list-style: none; gap: var(--spacing-6); margin: 0; padding: 0; }
+      .nav-link { color: var(--color-text-secondary); text-decoration: none; font-weight: 500; transition: color 0.3s; }
+      .nav-link:hover { color: var(--color-primary); }
+      .navbar-actions { display: flex; align-items: center; gap: var(--spacing-3); }
+    }
+    .theme-toggle { background: none; border: 1px solid var(--color-border); border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 1.2rem; transition: all 0.3s; }
+    .theme-toggle:hover { background: var(--color-bg-secondary); }
+    .lang-switch { background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: 8px; padding: 8px 12px; color: var(--color-text-primary); cursor: pointer; }
+    .btn { padding: 8px 16px; border-radius: 8px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border: none; transition: all 0.3s; }
+    .btn-secondary { background: var(--color-bg-secondary); color: var(--color-text-primary); border: 1px solid var(--color-border); }
+    .btn-secondary:hover { background: var(--color-border); }
+    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+    .user-menu { position: relative; display: none; }
+    .user-menu-toggle { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); cursor: pointer; font-family: inherit; font-size: 14px; color: var(--color-text-primary); }
+    .user-initial { width: 32px; height: 32px; border-radius: 50%; background: var(--color-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+    .user-dropdown { display: none; position: absolute; top: 100%; left: 0; min-width: 160px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1000; margin-top: 4px; }
+    .user-dropdown.show { display: block; }
+    .dropdown-item { display: block; padding: 10px 16px; color: var(--color-text-primary); text-decoration: none; transition: background 0.2s; }
+    .dropdown-item:hover { background: var(--color-bg-secondary); }
+    .dropdown-divider { border: none; border-top: 1px solid var(--color-border); margin: 4px 0; }
+
+    .logout-btn { display: none; padding: 8px 16px; font-size: 14px; }
+    
+    .last-updated {
+      background: rgba(99, 102, 241, 0.1);
+      border-right: 4px solid var(--color-primary);
+      padding: var(--spacing-4);
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+      margin: var(--spacing-4) 0;
+    }
+    
+    .last-updated {
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      margin-top: var(--spacing-8);
+      padding-top: var(--spacing-6);
+      border-top: 1px solid var(--color-border);
+    }
+    
+    .footer {
+      background: var(--color-bg-secondary);
+      border-top: 1px solid var(--color-border);
+      padding: var(--spacing-8) 0;
+      margin-top: var(--spacing-12);
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-4);
+    }
+    
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-3);
+    }
+    
+    .footer-logo img {
+      height: 40px;
+    }
+    
+    .footer-logo span {
+      font-weight: 700;
+      background: linear-gradient(135deg, #00d4ff, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: var(--spacing-6);
+    }
+    
+    .footer-links a {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .footer-links a:hover {
+      color: var(--color-primary);
+    }
+    
+    .footer-copy {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      width: 100%;
+      text-align: center;
+      margin-top: var(--spacing-4);
+    }
+    
+    @media (max-width: 768px) {
+      body { padding-top: 70px; }
+      .page-header h1 { font-size: 1.8rem; }
+      .content-section { padding: var(--spacing-4); }
+      .footer-content { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-container">
+        <a href="/" class="navbar-brand">
+          <img src="/logo.png" alt="ELECTRON VISION" class="navbar-logo">
+          <span class="navbar-brand-text">ELECTRON VISION</span>
+        </a>
+        
+        <button class="hamburger" id="hamburger" aria-label="القائمة" aria-expanded="false" aria-controls="navbarNav navbarActions">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <ul class="navbar-nav" id="navbarNav">
+          <li><a href="/" class="nav-link"><span class="nav-icon">🏠</span> الرئيسية</a></li>
+          <li><a href="/about" class="nav-link"><span class="nav-icon">👥</span> من نحن</a></li>
+          <li><a href="/services" class="nav-link"><span class="nav-icon">⚙️</span> الخدمات</a></li>
+          <li><a href="/products" class="nav-link"><span class="nav-icon">📦</span> المنتجات</a></li>
+          <li><a href="/sessions" class="nav-link"><span class="nav-icon">📅</span> الحجوزات</a></li>
+          <li><a href="/support" class="nav-link"><span class="nav-icon">🎫</span> الدعم الفني</a></li>
+          <li><a href="/contact" class="nav-link"><span class="nav-icon">💬</span> تواصل معنا</a></li>
+        </ul>
+
+        <div class="navbar-actions" id="navbarActions">
+          <button class="theme-toggle" onclick="toggleTheme()" title="تبديل السمة"><span>🌙</span></button>
+          <select class="lang-switch" onchange="setLanguage(this.value)">
+            <option value="ar" selected>العربية</option>
+            <option value="en">English</option>
+          </select>
+          <a href="/login" class="btn btn-secondary login-btn" id="loginBtn">تسجيل دخول</a>
+          <a href="/register" class="btn btn-primary register-btn" id="registerBtn">تسجيل</a>
+          <a href="/dashboard" class="btn btn-primary dashboard-btn" id="dashboardBtn" style="display: none;">
+            <i class="fas fa-home"></i> لوحة التحكم
+          </a>
+          <div class="user-menu" id="userMenu" style="display: none;">
+            <button class="user-menu-toggle" onclick="toggleUserMenu()">
+              <span class="user-initial" id="userInitial">U</span>
+              <span class="user-name" id="userName"></span>
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+              <a href="/dashboard" class="dropdown-item"><i class="fas fa-user"></i> لوحة التحكم</a>
+              <a href="/profile" class="dropdown-item"><i class="fas fa-cog"></i> الإعدادات</a>
+              <hr class="dropdown-divider">
+              <a href="#" class="dropdown-item logout-link"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a>
+            </div>
+          </div>
+          <button class="btn btn-danger logout-btn" id="logoutBtn" style="display: none;" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> خروج
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="page-content">
+    <div class="page-header">
+      <h1>📜 شروط الاستخدام</h1>
+      <p>آخر تحديث: 2026</p>
+    </div>
+
+    <div class="content-section">
+      <h2>1. القبول</h2>
+      <p>باستخدام موقع ELECTRON VISION، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على أي جزء من هذه الشروط، فلا يجوز لك استخدام خدماتنا.</p>
+    </div>
+
+    <div class="content-section">
+      <h2>2. الخدمات المقدمة</h2>
+      <p>تقدم ELECTRON VISION مجموعة من الخدمات التقنية包括:</p>
+      <ul>
+        <li>تطوير البرمجيات والتطبيقات</li>
+        <li>الاستشارات التقنية</li>
+        <li>الدعم الفني والصيانة</li>
+        <li>حلول الأمن السيبراني</li>
+        <li>خدمات السحابة وال托管</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>3. حسابات المستخدمين</h2>
+      <p>عند إنشاء حساب على منصتنا، يجب عليك:</p>
+      <ul>
+        <li>تقديم معلومات دقيقة وكاملة</li>
+        <li>الحفاظ على سرية كلمة المرور</li>
+        <li>تحديث معلومات账户 الخاصة بك</li>
+        <li>تحمل المسؤولية الكاملة عن جميع الأنشطة</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>4. الدفع والاشتراكات</h2>
+      <p>بعض خدماتنا تتطلبPayment. عند إجراءPayment:</p>
+      <ul>
+        <li>توافق على تقديم معلوماتPayment صالحة</li>
+        <li>تفوضنا بشحن المبلغ المحدد</li>
+        <li>تكون مسؤولاً عن أي ضرائب إضافية</li>
+      </ul>
+      <div class="highlight-box">
+        <strong>سياسة الاسترداد:</strong> يمكنك طلب استرداد المبلغ خلال 14 يومًا من الشراء إذا لم تكن راضيًا عن الخدمة المقدمة.
+      </div>
+    </div>
+
+    <div class="content-section">
+      <h2>5. حقوق الملكية الفكرية</h2>
+      <p>جميع المحتويات على موقعنا محمية بحقوق الملكية الفكرية:</p>
+      <ul>
+        <li>جميع الملفات والمواد المقدمة للمستخدمين</li>
+        <li>الشعارات والعلامات التجارية</li>
+        <li>الكود المصدري والحلول البرمجية</li>
+        <li>المحتوى التعليمي والتوثيقي</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>6. الاستخدام المحظور</h2>
+      <p>لا يجوز لك استخدام خدماتنا لـ:</p>
+      <ol>
+        <li>أي غرض غير قانوني أو يتعارض مع هذه الشروط</li>
+        <li>إرسال محتوى ضار أو malware</li>
+        <li>محاولة الوصول غير المصرح به إلى أنظمتنا</li>
+        <li>نسخ أو توزيع محتوى محمي بحقوق الملكية</li>
+        <li>إجراء معاملات مالية مزيفة</li>
+      </ol>
+    </div>
+
+    <div class="content-section">
+      <h2>7. إخلاء المسؤولية</h2>
+      <p>يتم تقديم الخدمات "كما هي" بدون أي ضمانات. لا نضمن أن:</p>
+      <ul>
+        <li>الخدمات ستعمل بدون انقطاع</li>
+        <li>ستكون النتائج دقيقة أو موثوقة</li>
+        <li>جودة الخدمات ستلبي توقعاتك</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>8. تحديد المسؤولية</h2>
+      <p>لن نكون مسؤولين عن أي أضرار غير مباشرة أو عرضية أو تبعية ناتجة عن استخدام خدماتنا، بما في ذلك على سبيل المثال لا الحصر:</p>
+      <ul>
+        <li>فقدان البيانات أو الأرباح</li>
+        <li>انقطاع الأعمال</li>
+        <li>أخطاء في المحتوى</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>9. الإنهاء</h2>
+      <p>我们可以终止您的账户如果我们:</p>
+      <ul>
+        <li>违反这些条款</li>
+        <li>发现欺诈或非法活动</li>
+        <li>需要维护系统安全</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
+      <h2>10. الاتصال بنا</h2>
+      <p>如果您对这些条款有任何疑问，请联系我们:</p>
+      <ul>
+        <li>电子邮件: support@electronvision.com</li>
+        <li>电话: +966 50 123 4567</li>
+        <li>网站: www.electronvision.com</li>
+      </ul>
+    </div>
+
+    <p class="last-updated">آخر تحديث: مارس 2026 | شركة ELECTRON VISION</p>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="/logo.png" alt="ELECTRON VISION">
+        <span>ELECTRON VISION</span>
+      </div>
+      <div class="footer-links">
+        <a href="/about">من نحن</a>
+        <a href="/services">الخدمات</a>
+        <a href="/products">المنتجات</a>
+        <a href="/contact">تواصل معنا</a>
+        <a href="/privacy">سياسة الخصوصية</a>
+        <a href="/terms">شروط الاستخدام</a>
+      </div>
+      <p class="footer-copy">© 2026 ELECTRON VISION. جميع الحقوق محفوظة.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    // Toggle user menu
+    function toggleUserMenu() {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) dropdown.classList.toggle('show');
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const userMenu = document.querySelector('.user-menu');
+      const userDropdown = document.getElementById('userDropdown');
+      if (userMenu && !userMenu.contains(e.target)) {
+        userDropdown && userDropdown.classList.remove('show');
+      }
+      if (e.target.classList.contains('logout-link') || e.target.closest('.logout-link')) {
+        e.preventDefault();
+        logout();
+      }
+    });
+    
+    // ===== HAMBURGER MENU =====
+    (function() {
+      var hamburger = document.getElementById('hamburger');
+      var nav = document.getElementById('navbarNav');
+      var actions = document.getElementById('navbarActions');
+      if (!hamburger || !nav) return;
+      var backdrop = document.createElement('div');
+      backdrop.className = 'menu-backdrop';
+      document.body.appendChild(backdrop);
+      var menuOpen = false;
+      function openMenu() {
+        menuOpen = true;
+        hamburger.classList.add('active');
+        hamburger.setAttribute('aria-expanded', 'true');
+        nav.classList.add('menu-open');
+        if (actions) actions.classList.add('menu-open');
+        backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeMenu() {
+        menuOpen = false;
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        nav.classList.remove('menu-open');
+        if (actions) actions.classList.remove('menu-open');
+        backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      hamburger.addEventListener('click', function(e) { e.stopPropagation(); if (menuOpen) closeMenu(); else openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      nav.querySelectorAll('.nav-link, a').forEach(function(link) { link.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && menuOpen) { closeMenu(); hamburger.focus(); } });
+    })();
+    
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (navbar) {
+        if (window.scrollY > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      }
+    });
+    
+    // Apply saved theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+</body>
+</html>
